@@ -908,8 +908,10 @@ function updateUI(d) {
   else if (d.ph > 7.5)  setChip('status-ph', 'warn', '⚠ ด่างมาก');
   else                  setChip('status-ph', 'ok', '✓ ปกติ');
 
-  // NPK
-  const nMax = 200, pMax = 200, kMax = 300;
+  // NPK — เกณฑ์กรมพัฒนาที่ดิน (ตารางที่ 15, กองสำรวจดิน 2523)
+  // P: ต่ำ <10, ปานกลาง 10–25, สูง >25 mg/kg · K: ต่ำ <60, ปานกลาง 60–90, สูง >90 mg/kg
+  // N: กรมฯ ไม่มีเกณฑ์ mg/kg — เป็นค่าประมาณจากเซ็นเซอร์ (ใช้ 50 เป็นค่าบ่งชี้)
+  const nMax = 200, pMax = 50, kMax = 150;
   setValue('val-n', Math.round(d.n) + ' <small>mg/kg</small>');
   setValue('val-p', Math.round(d.p) + ' <small>mg/kg</small>');
   setValue('val-k', Math.round(d.k) + ' <small>mg/kg</small>');
@@ -917,12 +919,16 @@ function updateUI(d) {
   animateBar('bar-p', d.p, pMax);
   animateBar('bar-k', d.k, kMax);
 
-  const npkIssues = [];
-  if (d.n < 50)  npkIssues.push('N ต่ำ');
-  if (d.p < 30)  npkIssues.push('P ต่ำ');
-  if (d.k < 100) npkIssues.push('K ต่ำ');
-  if (npkIssues.length > 0)
-    setChip('status-npk', 'warn', '⚠ ' + npkIssues.join(' / '));
+  const npkAlerts = [], npkWarns = [];
+  if (d.n < 50)      npkAlerts.push('N ต่ำ');
+  if (d.p < 10)      npkAlerts.push('P ต่ำ');
+  else if (d.p < 25) npkWarns.push('P ปานกลาง');
+  if (d.k < 60)      npkAlerts.push('K ต่ำ');
+  else if (d.k < 90) npkWarns.push('K ปานกลาง');
+  if (npkAlerts.length > 0)
+    setChip('status-npk', 'warn', '⚠ ' + npkAlerts.join(' / '));
+  else if (npkWarns.length > 0)
+    setChip('status-npk', 'warn', 'ℹ ' + npkWarns.join(' / '));
   else
     setChip('status-npk', 'ok', '✓ ปกติ');
 
@@ -954,20 +960,25 @@ function buildRecommendations(d) {
     recs.push({ type:'ok', icon:'✅', title:'pH อยู่ในเกณฑ์เหมาะสม', desc:`pH ${(+d.ph).toFixed(1)} อยู่ในช่วงเหมาะสม (5.5–7.5) สำหรับพืชส่วนใหญ่` });
   }
 
+  // เกณฑ์ P, K อ้างอิงกรมพัฒนาที่ดิน (ตารางที่ 15) · N เป็นค่าประมาณจากเซ็นเซอร์
   if (d.n < 50) {
-    recs.push({ type:'warn', icon:'🌿', title:'ไนโตรเจน (N) ต่ำ', desc:`N = ${Math.round(d.n)} mg/kg ควรใส่ปุ๋ยสูตรเน้น N เช่น 46-0-0 หรือ 21-0-0` });
+    recs.push({ type:'warn', icon:'🌿', title:'ไนโตรเจน (N) ค่อนข้างต่ำ', desc:`N = ${Math.round(d.n)} mg/kg (ค่าประมาณจากเซ็นเซอร์ — กรมฯ วัด N เป็น %) ควรใส่ปุ๋ยสูตรเน้น N เช่น 46-0-0 หรือ 21-0-0` });
   }
 
-  if (d.p < 30) {
-    recs.push({ type:'warn', icon:'🌱', title:'ฟอสฟอรัส (P) ต่ำ', desc:`P = ${Math.round(d.p)} mg/kg ควรใส่ปุ๋ยสูตรเน้น P เช่น 0-46-0 หรือหินฟอสเฟต` });
+  if (d.p < 10) {
+    recs.push({ type:'alert', icon:'🌱', title:'ฟอสฟอรัส (P) ต่ำ', desc:`P = ${Math.round(d.p)} mg/kg ต่ำกว่าเกณฑ์กรมพัฒนาที่ดิน (<10) ควรใส่ปุ๋ยสูตรเน้น P เช่น 0-46-0 หรือหินฟอสเฟต` });
+  } else if (d.p < 25) {
+    recs.push({ type:'warn', icon:'🌱', title:'ฟอสฟอรัส (P) ปานกลาง', desc:`P = ${Math.round(d.p)} mg/kg ระดับปานกลาง (10–25) ตามเกณฑ์กรมพัฒนาที่ดิน — ยังไม่ต้องใส่ปุ๋ย` });
   }
 
-  if (d.k < 100) {
-    recs.push({ type:'warn', icon:'🍂', title:'โพแทสเซียม (K) ต่ำ', desc:`K = ${Math.round(d.k)} mg/kg ควรใส่ปุ๋ยสูตรเน้น K เช่น 0-0-60 หรือโพแทสเซียมคลอไรด์` });
+  if (d.k < 60) {
+    recs.push({ type:'alert', icon:'🍂', title:'โพแทสเซียม (K) ต่ำ', desc:`K = ${Math.round(d.k)} mg/kg ต่ำกว่าเกณฑ์กรมพัฒนาที่ดิน (<60) ควรใส่ปุ๋ยสูตรเน้น K เช่น 0-0-60 หรือโพแทสเซียมคลอไรด์` });
+  } else if (d.k < 90) {
+    recs.push({ type:'warn', icon:'🍂', title:'โพแทสเซียม (K) ปานกลาง', desc:`K = ${Math.round(d.k)} mg/kg ระดับปานกลาง (60–90) ตามเกณฑ์กรมพัฒนาที่ดิน — ยังไม่ต้องใส่ปุ๋ย` });
   }
 
   if (d.ec > 2000) {
-    recs.push({ type:'alert', icon:'⚡', title:'ดินมีเกลือสูง — ระวังการใส่ปุ๋ย', desc:`EC = ${Math.round(d.ec)} µS/cm สูงมาก ควรระวังการใส่ปุ๋ยเพิ่ม อาจทำให้พืชชะงักการเจริญเติบโต` });
+    recs.push({ type:'alert', icon:'⚡', title:'เริ่มเป็นดินเค็ม — ระวังการใส่ปุ๋ย', desc:`EC = ${Math.round(d.ec)} µS/cm เกิน 2,000 (2 dS/m) = เริ่มเค็มเล็กน้อยตามเกณฑ์กรมพัฒนาที่ดิน ควรระวังการใส่ปุ๋ยเพิ่ม` });
   }
 
   if (d.temperature > 35) {
