@@ -63,3 +63,4 @@ backend/
 - No framework — vanilla HTML/CSS/JS for dashboard
 - ESP32 uses Arduino WebServer library
 - CORS is open (`*`) — intentional for local network access
+- **Keep `agriscan-presentation.html` updated** — whenever project files, thresholds, architecture, or behavior change, sync the presentation doc (sensor table, data flow, recommendations, limitations) with the new reality.
