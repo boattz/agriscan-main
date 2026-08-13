@@ -16,10 +16,10 @@ const char* WIFI_SSID = "YOUR_WIFI_SSID";
 const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
 
 // ── Cloud Upload ───────────────────────────────────────────
-// URL ของ backend บน Render (เปลี่ยนเป็น URL ของตัวเองหลัง deploy)
-const char* CLOUD_URL = "https://agriscan-backend-xxxx.onrender.com/api/readings";
+// URL ของ backend บน Render
+const char* CLOUD_URL = "https://agriscan-backend-l4vu.onrender.com/api/readings";
 // API key — ดูจาก Render Dashboard → Environment (API_KEY)
-const char* API_KEY   = "YOUR_API_KEY";
+const char* API_KEY   = "a/DgeJIw8fCwV2YdyrUQLKtEMb1IrM7dYa85KQLR0kQ=";
 // ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 60,000 = ทุก 1 นาที
 #define POST_INTERVAL_MS  60000
 
