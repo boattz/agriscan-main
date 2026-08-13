@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agriscan — เอกสารนำเสนอโปรเจกต์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  /* ═════════════ Design Tokens (ต่อยอดจากธีม Agriscan) ═════════════ */
+  :root {
+    --green-50:#f0fdf4; --green-100:#dcfce7; --green-200:#bbf7d0;
+    --green-300:#86efac; --green-400:#4ade80; --green-500:#22c55e;
+    --green-600:#16a34a; --green-700:#15803d; --green-800:#166534;
+    --green-900:#14532d; --green-950:#052e16;
+    --teal-400:#2dd4bf; --teal-500:#14b8a6; --teal-600:#0d9488;
+    --amber-400:#fbbf24; --amber-500:#f59e0b;
+    --red-400:#f87171; --red-500:#ef4444;
+    --blue-400:#60a5fa; --blue-500:#3b82f6;
+    --purple-400:#c084fc;
+    --bg-base:#0a1a12; --bg-card:#0f2418; --bg-card-2:#122b1e;
+    --bg-glass:rgba(22,101,52,0.18);
+    --border-dim:rgba(34,197,94,0.15); --border-glow:rgba(34,197,94,0.45);
+    --text-primary:#e2fce9; --text-secondary:#93c9a5; --text-muted:#4e7860;
+    --shadow-glow:0 0 32px rgba(34,197,94,0.12);
+    --shadow-card:0 4px 24px rgba(0,0,0,0.5);
+    --radius-card:18px; --radius-pill:999px;
+    --font-body:'Prompt',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:var(--font-body);
+    background:var(--bg-base); color:var(--text-primary);
+    min-height:100vh; overflow-x:hidden; line-height:1.6;
+  }
+
+  /* พื้นหลังแบบเดียวกับ dashboard */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(22,163,74,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(13,148,136,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 40%, rgba(74,222,128,0.04) 0%, transparent 50%);
+  }
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(74,222,128,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(74,222,128,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 60%, rgba(45,212,191,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 70%, rgba(74,222,128,0.15) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 80%, rgba(45,212,191,0.2) 0%, transparent 100%);
+  }
+
+  .page { position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:0 20px 80px; }
+
+  /* ═════════════ Sticky nav ═════════════ */
+  .topnav {
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,26,18,0.85); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border-dim);
+  }
+  .topnav-inner {
+    max-width:1000px; margin:0 auto; padding:10px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .topnav .brand { font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:8px; }
+  .topnav .brand-dot {
+    width:10px; height:10px; border-radius:50%; background:var(--green-400);
+    box-shadow:0 0 10px var(--green-400); animation:pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1; box-shadow:0 0 0 0 rgba(34,197,94,0.5);} 50%{opacity:.7; box-shadow:0 0 0 6px rgba(34,197,94,0);} }
+  .topnav a {
+    color:var(--text-secondary); text-decoration:none; font-size:0.78rem;
+    padding:4px 2px; border-bottom:2px solid transparent; transition:all .2s;
+  }
+  .topnav a:hover { color:var(--green-300); border-color:var(--border-glow); }
+  .topnav-links { display:flex; gap:14px; flex-wrap:wrap; }
+
+  /* ═════════════ Hero ═════════════ */
+  .hero { padding:64px 0 40px; }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:0.72rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--teal-400);
+    border:1px solid rgba(13,148,136,0.3); background:rgba(13,148,136,0.1);
+    padding:6px 14px; border-radius:var(--radius-pill); margin-bottom:22px;
+  }
+  .hero h1 {
+    font-size:clamp(2rem, 6vw, 3.4rem); font-weight:700; line-height:1.15;
+    letter-spacing:-0.5px;
+  }
+  .hero h1 .grad {
+    background:linear-gradient(90deg, var(--green-400), var(--teal-400));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero .lead {
+    margin-top:18px; font-size:clamp(1rem, 2.5vw, 1.2rem);
+    color:var(--text-secondary); max-width:640px; font-weight:300;
+  }
+  .hero .tags { margin-top:24px; display:flex; gap:10px; flex-wrap:wrap; }
+  .tag {
+    font-size:0.75rem; font-weight:500; padding:6px 14px; border-radius:var(--radius-pill);
+    border:1px solid var(--border-dim); background:var(--bg-card); color:var(--text-secondary);
+  }
+
+  /* ═════════════ Flow diagram (Signature) ═════════════ */
+  .flow-wrap {
+    margin:48px 0 0; padding:28px 24px 24px;
+    background:var(--bg-card); border:1px solid var(--border-dim);
+    border-radius:var(--radius-card); box-shadow:var(--shadow-card);
+    position:relative; overflow:hidden;
+  }
+  .flow-wrap::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--green-500), var(--teal-500), var(--green-500));
+    background-size:200% 100%; animation:slidebg 6s linear infinite;
+  }
+  @keyframes slidebg { to { background-position:-200% 0; } }
+  .flow-title {
+    font-size:0.72rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:20px;
+  }
+  .flow {
+    display:flex; align-items:stretch; gap:0; flex-wrap:wrap; justify-content:center;
+  }
+  .flow-node {
+    flex:1 1 140px; max-width:180px; text-align:center;
+    background:var(--bg-card-2); border:1px solid var(--border-dim);
+    border-radius:14px; padding:16px 10px 12px; position:relative;
+    transition:all .3s ease; opacity:.85;
+  }
+  .flow-node.active {
+    opacity:1; border-color:var(--border-glow);
+    box-shadow:0 0 24px rgba(34,197,94,0.2);
+    transform:translateY(-3px);
+  }
+  .flow-node .f-icon { font-size:1.6rem; line-height:1; margin-bottom:8px; }
+  .flow-node .f-name { font-size:0.8rem; font-weight:600; }
+  .flow-node .f-sub { font-size:0.66rem; color:var(--text-muted); margin-top:3px; }
+  .flow-conn {
+    flex:0 0 36px; display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .flow-conn::before {
+    content:''; width:100%; height:2px; background:rgba(34,197,94,0.25);
+    border-radius:2px;
+  }
+  .flow-conn .packet {
+    position:absolute; width:8px; height:8px; border-radius:50%;
+    background:var(--green-400); box-shadow:0 0 8px var(--green-400);
+    animation:travel 1.6s ease-in-out infinite; opacity:0;
+  }
+  .flow-conn:nth-child(2) .packet { animation-delay:0s; }
+  .flow-conn:nth-child(4) .packet { animation-delay:0.4s; }
+  .flow-conn:nth-child(6) .packet { animation-delay:0.8s; }
+  .flow-conn:nth-child(8) .packet { animation-delay:1.2s; }
+  @keyframes travel {
+    0% { left:0; opacity:0; } 20% { opacity:1; }
+    80% { opacity:1; } 100% { left:calc(100% - 8px); opacity:0; }
+  }
+
+  .flow-readout {
+    margin-top:20px; padding:14px 16px; border-radius:12px;
+    background:rgba(0,0,0,0.35); border:1px solid var(--border-dim);
+    font-family:var(--font-mono); font-size:0.78rem; line-height:1.8;
+    color:var(--text-secondary); white-space:pre-wrap; word-break:break-word;
+  }
+  .flow-readout .ok { color:var(--green-400); }
+  .flow-readout .dim { color:var(--text-muted); }
+
+  /* ═════════════ Section base ═════════════ */
+  section { margin-top:72px; }
+  .sec-head { margin-bottom:26px; }
+  .sec-num {
+    font-family:var(--font-mono); font-size:0.72rem; font-weight:600;
+    color:var(--teal-400); letter-spacing:0.1em; display:block; margin-bottom:8px;
+  }
+  .sec-head h2 {
+    font-size:clamp(1.4rem, 4vw, 1.9rem); font-weight:700; letter-spacing:-0.3px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .sec-head h2::after {
+    content:''; flex:1; height:1px; background:var(--border-dim);
+  }
+  .sec-head p { color:var(--text-secondary); margin-top:8px; font-size:0.92rem; font-weight:300; max-width:720px; }
+
+  /* ═════════════ Cards & grid ═════════════ */
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+
+  .card {
+    background:var(--bg-card); border:1px solid var(--border-dim);
+    border-radius:var(--radius-card); padding:20px 22px;
+    box-shadow:var(--shadow-card); position:relative; overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:var(--card-accent, linear-gradient(90deg,var(--green-500),var(--teal-500)));
+    opacity:.7; transition:opacity .25s;
+  }
+  .card:hover { transform:translateY(-3px); border-color:var(--border-glow); box-shadow:var(--shadow-card), 0 0 28px rgba(34,197,94,0.1); }
+  .card:hover::before { opacity:1; }
+  .card .c-label {
+    font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:8px;
+  }
+  .card .c-title { font-size:1rem; font-weight:600; margin-bottom:6px; }
+  .card .c-desc { font-size:0.82rem; color:var(--text-secondary); font-weight:300; }
+  .card .c-big {
+    font-family:var(--font-mono); font-size:1.6rem; font-weight:600;
+    color:var(--green-300); line-height:1.2;
+  }
+  .card .c-big small { font-size:0.72rem; color:var(--text-muted); font-family:var(--font-body); }
+
+  /* ═════════════ Stats strip ═════════════ */
+  .stats {
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:14px; margin-top:36px;
+  }
+  .stat {
+    background:var(--bg-glass); border:1px solid var(--border-dim);
+    border-radius:14px; padding:18px 16px; text-align:center;
+  }
+  .stat .v {
+    font-family:var(--font-mono); font-size:1.9rem; font-weight:700;
+    background:linear-gradient(90deg, var(--green-400), var(--teal-400));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .stat .k { font-size:0.72rem; color:var(--text-muted); margin-top:4px; letter-spacing:0.06em; }
+
+  /* ═════════════ Tables ═════════════ */
+  .table-wrap {
+    background:var(--bg-card); border:1px solid var(--border-dim);
+    border-radius:var(--radius-card); overflow-x:auto; box-shadow:var(--shadow-card);
+  }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px; }
+  thead th {
+    text-align:left; font-size:0.68rem; font-weight:600; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--text-muted);
+    padding:14px 18px; border-bottom:1px solid var(--border-dim);
+    background:rgba(22,101,52,0.15);
+  }
+  tbody td { padding:13px 18px; border-bottom:1px solid rgba(34,197,94,0.08); vertical-align:top; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr { transition:background .2s; }
+  tbody tr:hover { background:rgba(34,197,94,0.05); }
+  td .mono { font-family:var(--font-mono); font-size:0.8rem; color:var(--green-300); }
+  .pill {
+    display:inline-block; font-size:0.66rem; font-weight:600; padding:3px 10px;
+    border-radius:var(--radius-pill);
+  }
+  .pill.green { background:rgba(34,197,94,0.12); color:var(--green-400); }
+  .pill.teal  { background:rgba(20,184,166,0.12); color:var(--teal-400); }
+  .pill.amber { background:rgba(251,191,36,0.12); color:var(--amber-400); }
+  .pill.red   { background:rgba(239,68,68,0.12); color:var(--red-400); }
+  .pill.blue  { background:rgba(59,130,246,0.12); color:var(--blue-400); }
+  .pill.purple{ background:rgba(168,85,247,0.14); color:var(--purple-400); }
+
+  /* ═════════════ Code blocks ═════════════ */
+  pre {
+    background:rgba(0,0,0,0.4); border:1px solid var(--border-dim);
+    border-radius:14px; padding:18px 20px; overflow-x:auto;
+    font-family:var(--font-mono); font-size:0.78rem; line-height:1.7;
+    color:var(--text-secondary); margin:16px 0;
+  }
+  pre .c { color:var(--text-muted); }
+  pre .k { color:var(--teal-400); }
+  pre .s { color:var(--amber-400); }
+  pre .n { color:var(--green-300); }
+  code.inline {
+    font-family:var(--font-mono); font-size:0.78rem;
+    background:rgba(34,197,94,0.1); border:1px solid var(--border-dim);
+    color:var(--green-300); padding:1px 7px; border-radius:6px;
+  }
+
+  /* ═════════════ Flow steps (fallback chain) ═════════════ */
+  .chain { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+  .chain-step {
+    display:flex; align-items:center; gap:14px;
+    background:var(--bg-card); border:1px solid var(--border-dim);
+    border-radius:12px; padding:12px 16px; font-size:0.85rem;
+    transition:transform .2s, border-color .2s;
+  }
+  .chain-step:hover { transform:translateX(4px); border-color:var(--border-glow); }
+  .chain-step .no {
+    font-family:var(--font-mono); font-weight:700; font-size:0.85rem;
+    color:var(--teal-400); width:26px; height:26px; flex-shrink:0;
+    display:grid; place-items:center;
+    border:1px solid rgba(20,184,166,0.35); border-radius:8px;
+  }
+  .chain-step .src {
+    font-family:var(--font-mono); font-size:0.78rem; color:var(--green-300);
+    flex-shrink:0; min-width:0;
+  }
+  .chain-step .why { color:var(--text-muted); font-size:0.78rem; margin-left:auto; text-align:right; }
+
+  /* ═════════════ Lists ═════════════ */
+  ul.check { list-style:none; }
+  ul.check li { position:relative; padding-left:26px; margin-bottom:10px; font-size:0.88rem; color:var(--text-secondary); font-weight:300; }
+  ul.check li::before {
+    content:'✓'; position:absolute; left:0; top:1px;
+    color:var(--green-400); font-weight:700; font-size:0.9rem;
+  }
+  ul.check li b { color:var(--text-primary); font-weight:600; }
+
+  /* ═════════════ Callouts ═════════════ */
+  .callout {
+    border-radius:14px; padding:16px 20px; margin:18px 0;
+    border:1px solid; font-size:0.85rem;
+  }
+  .callout.warn { background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.25); color:var(--amber-400); }
+  .callout.info { background:rgba(59,130,246,0.06); border-color:rgba(59,130,246,0.22); color:var(--blue-400); }
+  .callout.ok   { background:rgba(34,197,94,0.06); border-color:rgba(34,197,94,0.2); color:var(--green-300); }
+  .callout b { color:inherit; }
+  .callout .t { display:block; font-weight:600; margin-bottom:4px; font-size:0.8rem; letter-spacing:0.04em; text-transform:uppercase; opacity:.85; }
+
+  /* ═════════════ File tree ═════════════ */
+  .tree {
+    font-family:var(--font-mono); font-size:0.8rem; line-height:2;
+    background:rgba(0,0,0,0.4); border:1px solid var(--border-dim);
+    border-radius:14px; padding:18px 22px; overflow-x:auto; color:var(--text-secondary);
+  }
+  .tree .dir { color:var(--teal-400); font-weight:600; }
+  .tree .cmt { color:var(--text-muted); }
+  .tree .f   { color:var(--green-300); }
+
+  /* ═════════════ Pros / cons ═════════════ */
+  .pros-cons { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+  .pc { border-radius:var(--radius-card); padding:20px 22px; border:1px solid; }
+  .pc.pro { background:rgba(34,197,94,0.05); border-color:rgba(34,197,94,0.2); }
+  .pc.con { background:rgba(239,68,68,0.05); border-color:rgba(239,68,68,0.2); }
+  .pc h3 { font-size:0.85rem; font-weight:700; margin-bottom:12px; letter-spacing:0.05em; }
+  .pc.pro h3 { color:var(--green-400); }
+  .pc.con h3 { color:var(--red-400); }
+  .pc ul { list-style:none; }
+  .pc li { padding-left:20px; position:relative; font-size:0.83rem; color:var(--text-secondary); margin-bottom:9px; font-weight:300; }
+  .pc.pro li::before { content:'+'; position:absolute; left:0; color:var(--green-400); font-weight:700; }
+  .pc.con li::before { content:'−'; position:absolute; left:0; color:var(--red-400); font-weight:700; }
+  .pc li b { color:var(--text-primary); font-weight:600; }
+
+  /* ═════════════ Presentation steps ═════════════ */
+  .pres-step {
+    display:flex; gap:18px; padding:20px 0; border-bottom:1px solid var(--border-dim);
+  }
+  .pres-step:last-child { border-bottom:none; }
+  .pres-step .big {
+    font-family:var(--font-mono); font-size:1.3rem; font-weight:700;
+    color:var(--teal-400); flex-shrink:0; width:44px; height:44px;
+    display:grid; place-items:center;
+    border:1px solid rgba(20,184,166,0.35); border-radius:12px;
+    background:rgba(13,148,136,0.08);
+  }
+  .pres-step h4 { font-size:0.95rem; font-weight:600; margin-bottom:4px; }
+  .pres-step p { font-size:0.84rem; color:var(--text-secondary); font-weight:300; }
+  .pres-step p b { color:var(--text-primary); font-weight:600; }
+
+  /* ═════════════ Footer ═════════════ */
+  footer {
+    margin-top:80px; padding-top:24px; border-top:1px solid var(--border-dim);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  footer p { font-size:0.75rem; color:var(--text-muted); }
+  .btn {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:9px 20px; border-radius:var(--radius-pill);
+    border:1px solid var(--border-glow); background:rgba(22,101,52,0.3);
+    color:var(--green-300); font-family:var(--font-body); font-size:0.82rem;
+    cursor:pointer; text-decoration:none; transition:all .2s;
+  }
+  .btn:hover { background:rgba(22,101,52,0.5); box-shadow:0 0 20px rgba(34,197,94,0.2); }
+
+  /* ═════════════ Scroll reveal ═════════════ */
+  .reveal { opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity:1; transform:none; }
+
+  /* ═════════════ Responsive ═════════════ */
+  @media (max-width:640px) {
+    .flow { flex-direction:column; align-items:center; gap:10px; }
+    .flow-conn { flex:0 0 26px; width:2px; min-height:26px; }
+    .flow-conn::before { width:2px; height:100%; }
+    .flow-conn .packet { width:8px; height:8px; animation:travel-v 1.6s ease-in-out infinite; }
+    @keyframes travel-v {
+      0% { top:0; opacity:0; } 20% { opacity:1; }
+      80% { opacity:1; } 100% { top:calc(100% - 8px); opacity:0; }
+    }
+    .chain-step { flex-wrap:wrap; }
+    .chain-step .why { margin-left:0; text-align:left; width:100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+    .reveal { opacity:1; transform:none; }
+  }
+
+  /* ═════════════ Print ═════════════ */
+  @media print {
+    body { background:#fff; color:#000; }
+    body::before, body::after, .topnav, .btn { display:none !important; }
+    .card, .table-wrap, .tree, pre, .flow-wrap { box-shadow:none; background:#fff; border-color:#ccc; color:#000; }
+    .card .c-desc, .pc li, .pres-step p, .sec-head p { color:#333; }
+    .topnav { position:static; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="brand"><span class="brand-dot"></span>Agriscan</span>
+    <div class="topnav-links">
+      <a href="#overview">ภาพรวม</a>
+      <a href="#sensors">เซ็นเซอร์</a>
+      <a href="#architecture">สถาปัตยกรรม</a>
+      <a href="#esp32">ESP32</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#backend">Backend</a>
+      <a href="#limitations">ข้อจำกัด</a>
+      <a href="#present">แนวทางนำเสนอ</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <header class="hero reveal">
+    <span class="eyebrow">● เอกสารประกอบการนำเสนอโปรเจกต์</span>
+    <h1>Agriscan<br /><span class="grad">ระบบ IoT ตรวจวัดค่าดินแบบ Real-time</span></h1>
+    <p class="lead">
+      ระบบอ่านค่าคุณภาพดิน 7 อย่างจากเซ็นเซอร์ RS485 Modbus ผ่าน ESP32
+      แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที พร้อมระบบแนะนำการดูแลดินอัตโนมัติ
+    </p>
+    <div class="tags">
+      <span class="tag">🌱 IoT</span>
+      <span class="tag">📡 RS485 Modbus</span>
+      <span class="tag">⚙️ ESP32</span>
+      <span class="tag">🖥️ Vanilla JS — ไม่มี Build Step</span>
+      <span class="tag">🇹🇭 UI ภาษาไทย</span>
+    </div>
+
+    <!-- Flow diagram -->
+    <div class="flow-wrap">
+      <div class="flow-title">Data Flow — จากดินสู่หน้าจอ</div>
+      <div class="flow" id="flow">
+        <div class="flow-node" data-step="0">
+          <div class="f-icon">🌱</div>
+          <div class="f-name">เซ็นเซอร์ดิน 7-in-1</div>
+          <div class="f-sub">Moisture · Temp · EC · pH · NPK</div>
+        </div>
+        <div class="flow-conn"><span class="packet"></span></div>
+        <div class="flow-node" data-step="1">
+          <div class="f-icon">🔌</div>
+          <div class="f-name">RS485 Modbus</div>
+          <div class="f-sub">9600 baud · 2 สาย · Slave ID 1</div>
+        </div>
+        <div class="flow-conn"><span class="packet"></span></div>
+        <div class="flow-node" data-step="2">
+          <div class="f-icon">⚙️</div>
+          <div class="f-name">ESP32</div>
+          <div class="f-sub">อ่านค่า → สร้าง JSON → เสิร์ฟเว็บ</div>
+        </div>
+        <div class="flow-conn"><span class="packet"></span></div>
+        <div class="flow-node" data-step="3">
+          <div class="f-icon">📶</div>
+          <div class="f-name">WiFi</div>
+          <div class="f-sub">HTTP · mDNS: agriscan.local</div>
+        </div>
+        <div class="flow-conn"><span class="packet"></span></div>
+        <div class="flow-node" data-step="4">
+          <div class="f-icon">🖥️</div>
+          <div class="f-name">Dashboard</div>
+          <div class="f-sub">ดึงข้อมูลทุก 5 วินาที</div>
+        </div>
+      </div>
+      <div class="flow-readout" id="readout"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="v">7</div><div class="k">ค่าที่วัดได้</div></div>
+      <div class="stat"><div class="v">5s</div><div class="k">รอบการอัปเดต</div></div>
+      <div class="stat"><div class="v">3</div><div class="k">องค์ประกอบหลัก</div></div>
+      <div class="stat"><div class="v">0</div><div class="k">Build Step / Framework</div></div>
+    </div>
+  </header>
+
+  <!-- ═══════════ 01 ภาพรวม ═══════════ -->
+  <section id="overview">
+    <div class="sec-head reveal">
+      <span class="sec-num">01 — ภาพรวม</span>
+      <h2>โปรเจกต์นี้คืออะไร?</h2>
+      <p>Agriscan คือระบบ IoT สำหรับการเกษตร ตรวจวัดสภาพดิน 7 อย่างแบบเรียลไทม์ ตั้งแต่ระดับฮาร์ดแวร์จนถึงหน้าจอแสดงผล — สร้างด้วยหลักการ "เรียบง่ายที่สุดที่ใช้งานได้จริง"</p>
+    </div>
+    <div class="grid3">
+      <div class="card reveal" style="--card-accent:linear-gradient(90deg,#22c55e,#4ade80);">
+        <div class="c-label">01 · ฮาร์ดแวร์</div>
+        <div class="c-title">ESP32 + เซ็นเซอร์ 7-in-1</div>
+        <div class="c-desc">เซ็นเซอร์ฝังดินอ่านค่า 7 อย่าง (ความชื้น, อุณหภูมิ, EC, pH, N, P, K) ส่งผ่านสาย RS485 Modbus 2 เส้นให้ ESP32</div>
+      </div>
+      <div class="card reveal" style="--card-accent:linear-gradient(90deg,#14b8a6,#2dd4bf);">
+        <div class="c-label">02 · ตัวกลาง</div>
+        <div class="c-title">ESP32 ทำทุกอย่างในตัวเดียว</div>
+        <div class="c-desc">อ่านค่าเซ็นเซอร์, ตั้งชื่อตัวเองผ่าน mDNS, รัน Web Server และเสิร์ฟหน้า Dashboard เอง — ทำงานแบบ self-contained ไม่พึ่ง server ใด</div>
+      </div>
+      <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
+        <div class="c-label">03 · การแสดงผล</div>
+        <div class="c-title">Dashboard เว็บ + คำแนะนำ</div>
+        <div class="c-desc">หน้าเว็บ Vanilla HTML/CSS/JS ดึงข้อมูลทุก 5 วินาที แสดงการ์ดเซ็นเซอร์ 5 ใบ พร้อมวิเคราะห์และแนะนำการดูแลดินอัตโนมัติเป็นภาษาไทย</div>
+      </div>
+    </div>
+    <div class="callout info reveal">
+      <span class="t">เพิ่มเติม</span>
+      มี <b>Backend Flask</b> หนึ่งตัวที่สร้างข้อมูลจำลอง (mock data) ไว้สำหรับสาธิตบนคลาวด์ (Render.com) — ใช้ตอนที่ไม่มีเซ็นเซอร์จริงติดตัว
+    </div>
+  </section>
+
+  <!-- ═══════════ 02 เซ็นเซอร์ ═══════════ -->
+  <section id="sensors">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 — เซ็นเซอร์</span>
+      <h2>ค่าที่วัดได้และช่วงปกติ</h2>
+      <p>ระบบอ่านค่า 7 อย่างจากเซ็นเซอร์เดียวกันผ่านโปรโตคอล Modbus RTU โดยอ่าน Holding Registers 0x0000–0x0006 ต่อเนื่อง 7 ตัวในคำสั่งเดียว</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>ค่า</th><th>หน่วย</th><th>ช่วงปกติ</th><th>สถานะผิดปกติ</th><th>ความหมาย</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>ความชื้น</b> (Moisture)</td>
+            <td class="mono">%</td><td>30–80</td>
+            <td><span class="pill red">&lt; 30 แห้ง</span> <span class="pill blue">&gt; 80 ชื้นเกิน</span></td>
+            <td>น้ำในดิน ต่ำ = ควรรดน้ำ สูง = รากเน่าได้</td>
+          </tr>
+          <tr>
+            <td><b>อุณหภูมิ</b> (Temperature)</td>
+            <td class="mono">°C</td><td>15–35</td>
+            <td><span class="pill amber">&lt; 15 เย็น</span> <span class="pill red">&gt; 35 ร้อน</span></td>
+            <td>ความร้อนในดิน ส่งผลต่อการดูดซึมของราก</td>
+          </tr>
+          <tr>
+            <td><b>EC</b> (การนำไฟฟ้า)</td>
+            <td class="mono">µS/cm</td><td>100–2000</td>
+            <td><span class="pill amber">&lt; 100 ต่ำ</span> <span class="pill red">&gt; 2000 เค็ม</span></td>
+            <td>ความเข้มข้นเกลือ/ธาตุอาหาร สูงเกิน = ดินเค็ม</td>
+          </tr>
+          <tr>
+            <td><b>pH ดิน</b></td>
+            <td class="mono">pH</td><td>5.5–7.5</td>
+            <td><span class="pill red">&lt; 5.5 กรด</span> <span class="pill amber">&gt; 7.5 ด่าง</span></td>
+            <td>ความเป็นกรด-ด่าง มีผลต่อการดูดธาตุอาหาร</td>
+          </tr>
+          <tr>
+            <td><b>ไนโตรเจน</b> (N)</td>
+            <td class="mono">mg/kg</td><td>≥ 50</td>
+            <td><span class="pill amber">&lt; 50 ต่ำ</span></td>
+            <td>ธาตุหลัก เร่งการเจริญเติบโตของใบ</td>
+          </tr>
+          <tr>
+            <td><b>ฟอสฟอรัส</b> (P)</td>
+            <td class="mono">mg/kg</td><td>≥ 30</td>
+            <td><span class="pill amber">&lt; 30 ต่ำ</span></td>
+            <td>เร่งการเจริญของราก ดอก และผล</td>
+          </tr>
+          <tr>
+            <td><b>โพแทสเซียม</b> (K)</td>
+            <td class="mono">mg/kg</td><td>≥ 100</td>
+            <td><span class="pill amber">&lt; 100 ต่ำ</span></td>
+            <td>เสริมความแข็งแรงของลำต้น ต้านทานโรค</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout ok reveal">
+      <span class="t">จุดน่าสนใจ</span>
+      ค่า EC ไม่ได้วัด "เกลือ" โดยตรง — แต่วัดความสามารถในการนำไฟฟ้าของน้ำในดิน ซึ่งสะท้อนความเข้มข้นของธาตุอาหารที่ละลายอยู่ ถ้าสูงเกินไปแสดงว่าดินเค็ม (จากปุ๋ยหรือน้ำทะเล) ทำให้พืชชะงักการเจริญเติบโต
+    </div>
+  </section>
+
+  <!-- ═══════════ 03 สถาปัตยกรรม ═══════════ -->
+  <section id="architecture">
+    <div class="sec-head reveal">
+      <span class="sec-num">03 — สถาปัตยกรรม</span>
+      <h2>โครงสร้างโปรเจกต์</h2>
+      <p>สามส่วนหลักแยกจากกันชัดเจน: firmware บน ESP32, dashboard ที่เปิดได้ทั้งจากเครื่องและฝังอยู่ในตัว ESP32, และ backend mock สำหรับคลาวด์</p>
+    </div>
+    <div class="grid2">
+      <div class="reveal">
+        <div class="tree">
+<span class="dir">esp32/agriscan/</span>
+  agriscan.ino   <span class="cmt">← firmware: RS485 + WiFi + WebServer</span>
+  dashboard.h    <span class="cmt">← dashboard ฝังใน C++ raw string</span>
+
+<span class="dir">dashboard/</span>
+  index.html     <span class="cmt">← หน้าเว็บ standalone</span>
+  script.js      <span class="cmt">← logic, IP fallback, คำแนะนำ</span>
+  style.css      <span class="cmt">← dark green glassmorphism</span>
+
+<span class="dir">backend/</span>
+  app.py         <span class="cmt">← Flask mock API (Render.com)</span>
+  requirements.txt
+
+render.yaml      <span class="cmt">← config deploy บน Render</span>
+        </div>
+      </div>
+      <div>
+        <div class="card reveal" style="--card-accent:linear-gradient(90deg,#a855f7,#3b82f6);">
+          <div class="c-label">หัวใจของดีไซน์</div>
+          <div class="c-title">ESP32 คือระบบที่สมบูรณ์ในตัวเอง</div>
+          <div class="c-desc">
+            <ul class="check" style="margin-top:10px;">
+              <li><b>dashboard.h</b> ฝังหน้าเว็บทั้ง HTML/CSS/JS เป็น C++ string literal → ESP32 เสิร์ฟเองได้ ไม่ต้องพึ่งอินเทอร์เน็ต</li>
+              <li><b>dashboard/</b> เป็นเวอร์ชัน standalone เดียวกัน เปิดจากเครื่องหรือ deploy กับ backend ได้</li>
+              <li>สองเวอร์ชันนี้<b>ต้องซิงค์กันด้วยมือ</b> (ไม่มี build script)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card reveal" style="--card-accent:linear-gradient(90deg,#f59e0b,#fbbf24); margin-top:16px;">
+          <div class="c-label">เทคโนโลยี</div>
+          <div class="c-title">สแตกทั้งหมด</div>
+          <div class="c-desc">
+            <ul class="check" style="margin-top:10px;">
+              <li><b>ESP32:</b> ModbusMaster (Arduino library)</li>
+              <li><b>Frontend:</b> Vanilla HTML/CSS/JS — ไม่มี framework, ไม่มี build step</li>
+              <li><b>Backend:</b> Flask 3.0.3 + flask-cors + gunicorn</li>
+              <li><b>Fonts:</b> Prompt (ไทย) + JetBrains Mono (ตัวเลข)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 04 ESP32 ═══════════ -->
+  <section id="esp32">
+    <div class="sec-head reveal">
+      <span class="sec-num">04 — Firmware ESP32</span>
+      <h2>ESP32: ตัวกลางแปลงเซ็นเซอร์เป็นเว็บ API</h2>
+      <p>โค้ด Arduino C++ ใน <code class="inline">agriscan.ino</code> ทำหน้าที่: อ่านค่า Modbus → เก็บค่าในหน่วยความจำ → เสิร์ฟ JSON ให้ dashboard</p>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="card reveal" style="--card-accent:linear-gradient(90deg,#06b6d4,#2dd4bf);">
+          <div class="c-label">การต่อฮาร์ดแวร์</div>
+          <div class="c-title">RS485 ↔ ESP32</div>
+          <div class="c-desc" style="margin-top:8px;">
+            <table style="width:100%; min-width:0; font-size:0.8rem;">
+              <tbody>
+                <tr><td style="padding:6px 0;"><b>RX</b> (รับข้อมูล)</td><td style="text-align:right;" class="mono">GPIO 16</td></tr>
+                <tr><td style="padding:6px 0;"><b>TX</b> (ส่งข้อมูล)</td><td style="text-align:right;" class="mono">GPIO 17</td></tr>
+                <tr><td style="padding:6px 0;"><b>DE/RE</b> (ควบคุม MAX485)</td><td style="text-align:right;" class="mono">GPIO 4</td></tr>
+                <tr><td style="padding:6px 0;"><b>Baud rate</b></td><td style="text-align:right;" class="mono">9600 · 8N1</td></tr>
+                <tr><td style="padding:6px 0;"><b>Modbus Slave ID</b></td><td style="text-align:right;" class="mono">1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card reveal" style="margin-top:16px; --card-accent:linear-gradient(90deg,#22c55e,#4ade80);">
+          <div class="c-label">Web Server (พอร์ต 80)</div>
+          <div class="c-title">API ของ ESP32</div>
+          <div class="c-desc" style="margin-top:8px;">
+            <ul class="check">
+              <li><code class="inline">GET /</code> → เสิร์ฟหน้า Dashboard (จาก dashboard.h)</li>
+              <li><code class="inline">GET /data</code> → ค่าเซ็นเซอร์เป็น JSON พร้อม <b>CORS เปิดทั้งหมด</b></li>
+              <li><code class="inline">mDNS</code> → เข้าผ่าน <code class="inline">http://agriscan.local</code> ไม่ต้องจำ IP</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card reveal" style="--card-accent:linear-gradient(90deg,#a855f7,#ec4899);">
+          <div class="c-label">วงจรการทำงาน</div>
+          <div class="c-title">loop() ทุก 5 วินาที</div>
+          <div class="c-desc" style="margin-top:8px;">
+            <ul class="check">
+              <li>รับ HTTP request ผ่าน <code class="inline">server.handleClient()</code> ตลอดเวลา</li>
+              <li>ตรวจ WiFi ถ้าหลุด → <b>reconnect อัตโนมัติ</b></li>
+              <li>อ่านค่าเซ็นเซอร์ผ่าน Modbus (<code class="inline">readHoldingRegisters(0x0000, 7)</code>)</li>
+              <li>อ่านสำเร็จ → อัปเดตค่า / ไม่สำเร็จ → <b>ใช้ค่าเดิม</b> (ระบบทนทานต่อการขาดการติดต่อชั่วคราว)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card reveal" style="margin-top:16px; --card-accent:linear-gradient(90deg,#f97316,#fbbf24);">
+          <div class="c-label">การแปลงค่าจาก Register</div>
+          <div class="c-title">Raw → หน่วยจริง</div>
+          <div class="c-desc" style="margin-top:8px;">
+            <ul class="check">
+              <li>ความชื้น = <code class="inline">reg[0] / 10</code></li>
+              <li>อุณหภูมิ = <code class="inline">(int16)reg[1] / 10</code> (รองรับค่าลบ)</li>
+              <li>EC = <code class="inline">reg[2]</code> · pH = <code class="inline">reg[3] / 10</code></li>
+              <li>N, P, K = <code class="inline">reg[4..6]</code> (mg/kg)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin:22px 0 8px;">ตัวอย่าง JSON ที่ ESP32 ส่งออก</div>
+<pre><span class="c">// GET /data</span>
+{ <span class="k">"moisture"</span>: <span class="n">45.2</span>, <span class="k">"temperature"</span>: <span class="n">28.5</span>, <span class="k">"ec"</span>: <span class="n">320</span>,
+  <span class="k">"ph"</span>: <span class="n">6.8</span>, <span class="k">"n"</span>: <span class="n">45</span>, <span class="k">"p"</span>: <span class="n">32</span>, <span class="k">"k"</span>: <span class="n">89</span>,
+  <span class="k">"valid"</span>: <span class="n">true</span> }</pre>
+    </div>
+  </section>
+
+  <!-- ═══════════ 05 Dashboard ═══════════ -->
+  <section id="dashboard">
+    <div class="sec-head reveal">
+      <span class="sec-num">05 — Dashboard</span>
+      <h2>หน้าแสดงผลและ "สมอง" ของระบบ</h2>
+      <p>แดชบอร์ด Vanilla JS ธีม dark green glassmorphism ภาษาไทย — ดึงข้อมูลทุก 5 วินาที พร้อมระบบหาที่อยู่ของ ESP32 อัตโนมัติ และแนะนำการดูแลดิน</p>
+    </div>
+
+    <div class="grid2">
+      <div class="card reveal" style="--card-accent:linear-gradient(90deg,#22c55e,#4ade80);">
+        <div class="c-label">องค์ประกอบ UI</div>
+        <div class="c-title">บนหน้าจอมีอะไรบ้าง</div>
+        <div class="c-desc" style="margin-top:8px;">
+          <ul class="check">
+            <li><b>Header:</b> โลโก้, สถานะออนไลน์/ออฟไลน์ (ไฟกระพริบ), เวลาอัปเดตล่าสุด, ป้าย IP ที่เชื่อมต่ออยู่ (คลิกเปลี่ยนได้)</li>
+            <li><b>การ์ดเซ็นเซอร์ 5 ใบ:</b> ความชื้น (มี progress bar สีเปลี่ยนตามสถานะ), อุณหภูมิ, EC, pH, NPK (กราฟแท่ง 3 สี)</li>
+            <li><b>คำแนะนำอัตโนมัติ:</b> การ์ดวิเคราะห์ค่าแต่ละตัวแบบ real-time</li>
+            <li><b>Banner:</b> แจ้ง "กำลังเชื่อมต่อ" และ "แสดงข้อมูลจำลอง"</li>
+            <li><b>ลูกเล่น:</b> ตัวเลขกระพริบเมื่อค่ามีการเปลี่ยนแปลง, skeleton loading, ปุ่มรีเฟรช</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card reveal" style="--card-accent:linear-gradient(90deg,#a855f7,#3b82f6);">
+        <div class="c-label">ระบบแนะนำอัตโนมัติ</div>
+        <div class="c-title">ตัวอย่างคำแนะนำ (ภาษาไทย)</div>
+        <div class="c-desc" style="margin-top:8px;">
+          <ul class="check">
+            <li>ความชื้น &lt; 30% → <b>"ควรรดน้ำทันที"</b></li>
+            <li>ความชื้น &gt; 80% → <b>"หยุดรดน้ำ — อาจรากเน่า"</b></li>
+            <li>pH &lt; 5.5 → <b>"ใส่ปูนขาว (Lime)"</b> / &gt; 7.5 → <b>"ใส่กำมะถัน"</b></li>
+            <li>N ต่ำ → <b>"ใส่ปุ๋ยสูตร 46-0-0 หรือ 21-0-0"</b></li>
+            <li>P ต่ำ → <b>"ใส่ปุ๋ยสูตร 0-46-0 หรือหินฟอสเฟต"</b></li>
+            <li>K ต่ำ → <b>"ใส่ปุ๋ยสูตร 0-0-60"</b></li>
+            <li>EC &gt; 2000 → <b>"ระวัง! ดินเค็ม อย่าใส่ปุ๋ยเพิ่ม"</b></li>
+            <li>อุณหภูมิ &gt; 35°C → <b>"คลุมดินเพื่อลดความร้อน"</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:18px;">
+      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px;">Fallback Chain — ระบบหาตำแหน่ง ESP32 อัตโนมัติ (ลองตามลำดับ)</div>
+      <div class="chain">
+        <div class="chain-step"><span class="no">1</span><span class="src">IP ที่ผู้ใช้ตั้งเอง (localStorage)</span><span class="why">จำจาก session ก่อนหน้า</span></div>
+        <div class="chain-step"><span class="no">2</span><span class="src">URL ที่เชื่อมต่อสำเร็จล่าสุด</span><span class="why">เร็วสุดสำหรับการใช้งานซ้ำ</span></div>
+        <div class="chain-step"><span class="no">3</span><span class="src">Page Origin (หน้าเว็บที่เปิดอยู่)</span><span class="why">กรณีเปิดผ่าน ESP32 โดยตรง</span></div>
+        <div class="chain-step"><span class="no">4</span><span class="src">http://agriscan.local/data</span><span class="why">mDNS ของ ESP32</span></div>
+        <div class="chain-step"><span class="no">5</span><span class="src">http://192.168.1.1/data</span><span class="why">gateway ตอนใช้ hotspot</span></div>
+        <div class="chain-step"><span class="no">6</span><span class="src">http://localhost:5000/data</span><span class="why">mock backend (Flask)</span></div>
+      </div>
+      <div class="callout info reveal" style="margin-top:14px;">
+        <span class="t">การกันพลาด</span>
+        แต่ละ URL มี timeout 3 วินาที (<code class="inline">AbortController</code>) — ถ้าลองครบแล้วเชื่อมไม่ได้ จะสลับเป็น <b>mock data พร้อมแบนเนอร์สีน้ำเงิน</b> แจ้งชัดเจนว่า "แสดงข้อมูลจำลอง — ESP32 ยังไม่ได้เชื่อมต่อ" และพยายามใหม่ทุก 5 วินาที / ทันทีที่กลับมาที่แท็บ
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 06 Backend ═══════════ -->
+  <section id="backend">
+    <div class="sec-head reveal">
+      <span class="sec-num">06 — Backend</span>
+      <h2>Flask Mock API สำหรับสาธิตบนคลาวด์</h2>
+      <p>เมื่อสาธิตบน Render.com ไม่มีเซ็นเซอร์จริงติดตัว — Backend ตัวเล็ก ๆ นี้สร้างข้อมูลจำลองให้ dashboard แสดงผลได้เหมือนของจริง</p>
+    </div>
+    <div class="grid3">
+      <div class="card reveal">
+        <div class="c-big">GET /</div>
+        <div class="c-desc" style="margin-top:6px;">เสิร์ฟหน้า dashboard (โฟลเดอร์ <code class="inline">dashboard/</code>)</div>
+      </div>
+      <div class="card reveal">
+        <div class="c-big">GET /data</div>
+        <div class="c-desc" style="margin-top:6px;">ข้อมูลจำลองแบบสุ่ม ใกล้เคียงค่าจริง (ความชื้น 40–50%, อุณหภูมิ 27–31°C, EC 300–400...)</div>
+      </div>
+      <div class="card reveal">
+        <div class="c-big">GET /health</div>
+        <div class="c-desc" style="margin-top:6px;">ตรวจสถานะ service — คืน <code class="inline">{"status":"healthy"}</code></div>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:18px;">
+      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">วิธีรัน / Deploy</div>
+<pre><span class="c"># รันในเครื่อง (dev)</span>
+pip install -r backend/requirements.txt
+cd backend && python app.py          <span class="c"># http://localhost:5000</span>
+
+<span class="c"># Deploy บน Render.com — ผ่าน render.yaml อัตโนมัติ</span>
+<span class="c"># Python 3.10 · gunicorn app:app · CORS เปิดทั้งหมด</span></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════ 07 จุดเด่น / ข้อจำกัด ═══════════ -->
+  <section id="limitations">
+    <div class="sec-head reveal">
+      <span class="sec-num">07 — ประเมินโปรเจกต์</span>
+      <h2>จุดเด่นและข้อจำกัด</h2>
+      <p>ส่วนนี้ช่วยตอบคำถามผู้ชมได้อย่างมั่นใจ — รู้ทั้งสิ่งที่ทำได้ดีและขอบเขตที่ยังไม่ได้ทำ</p>
+    </div>
+    <div class="pros-cons">
+      <div class="pc pro reveal">
+        <h3>จุดเด่น</h3>
+        <ul>
+          <li><b>Self-contained:</b> ESP32 เสิร์ฟ dashboard เองได้ ไม่ต้องพึ่ง server หรืออินเทอร์เน็ต</li>
+          <li><b>ติดตั้งง่าย:</b> ไม่มี build step, ไม่มี framework, ไม่มี database — แค่เปิดไฟล์ HTML</li>
+          <li><b>กันพลาดสูง:</b> fallback chain 6 ระดับ + mock data → หน้าจอไม่เคยว่าง</li>
+          <li><b>ทนทาน:</b> อ่านเซ็นเซอร์ไม่สำเร็จใช้ค่าเดิม, WiFi หลุด reconnect อัตโนมัติ</li>
+          <li><b>ใช้งานง่าย:</b> UI ภาษาไทย + คำแนะนำบอกสูตรปุ๋ยเป็นตัวเลขชัดเจน</li>
+          <li><b>เข้าถึงง่าย:</b> mDNS (agriscan.local) ไม่ต้องจำ IP</li>
+        </ul>
+      </div>
+      <div class="pc con reveal">
+        <h3>ข้อจำกัด (ต้องรู้ก่อนนำเสนอ)</h3>
+        <ul>
+          <li><b>แสดงผลอย่างเดียว:</b> ไม่มี relay/actuator — ระบบแนะนำแต่ไม่ได้รดน้ำให้อัตโนมัติ</li>
+          <li><b>ไม่มีประวัติข้อมูล:</b> แสดงค่าปัจจุบันเท่านั้น ไม่มี graph ย้อนหลัง / database</li>
+          <li><b>WiFi hardcode:</b> SSID/รหัสอยู่ในโค้ด ต้องแก้และ re-flash เพื่อเปลี่ยนเครือข่าย</li>
+          <li><b>ต้องซิงค์ 2 ชุดด้วยมือ:</b> <code class="inline">dashboard.h</code> (ฝังใน ESP32) กับโฟลเดอร์ <code class="inline">dashboard/</code></li>
+          <li><b>ความปลอดภัย:</b> CORS เปิด <code class="inline">*</code> และไม่มี authentication — ตั้งใจทำเพื่อเครือข่ายท้องถิ่น</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 08 แนวทางนำเสนอ ═══════════ -->
+  <section id="present">
+    <div class="sec-head reveal">
+      <span class="sec-num">08 — คู่มือนำเสนอ</span>
+      <h2>แนวทางการสาธิต (5 นาที)</h2>
+      <p>ลำดับการนำเสนอที่เล่าเรื่องได้ครบ: ปัญหา → วิธีแก้ → สาธิตจริง → จุดแข็ง → ต่อยอด</p>
+    </div>
+    <div class="card reveal" style="padding:10px 22px;">
+      <div class="pres-step">
+        <div class="big">1</div>
+        <div>
+          <h4>เปิดด้วยภาพรวม</h4>
+          <p>"ระบบ IoT ตรวจวัดค่าดิน 7 อย่างแบบ real-time สำหรับเกษตรกร — รู้ทันทีว่าดินแห้ง ดินเค็ม หรือขาดธาตุอาหาร"</p>
+        </div>
+      </div>
+      <div class="pres-step">
+        <div class="big">2</div>
+        <div>
+          <h4>ชี้ฮาร์ดแวร์ให้เห็น</h4>
+          <p>โชว์<b>เซ็นเซอร์ฝังดิน</b> → สาย RS485 2 เส้น → <b>ESP32</b> อธิบายว่า "สาย 2 เส้นนี้พาค่า 7 อย่างไปได้ทั้งชุด"</p>
+        </div>
+      </div>
+      <div class="pres-step">
+        <div class="big">3</div>
+        <div>
+          <h4>สาธิตสด</h4>
+          <p>เปิด <b>http://agriscan.local</b> โชว์ค่าที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> ให้เห็น log การอ่านค่าแบบ raw</p>
+        </div>
+      </div>
+      <div class="pres-step">
+        <div class="big">4</div>
+        <div>
+          <h4>โชว์ "สมอง" ของระบบ</h4>
+          <p>ชี้การ์ด<b>คำแนะนำ</b> — "ถ้าความชื้นต่ำ ระบบบอกให้รดน้ำ ถ้า N ต่ำ ระบบบอกสูตรปุ๋ยให้เลย 46-0-0"</p>
+        </div>
+      </div>
+      <div class="pres-step">
+        <div class="big">5</div>
+        <div>
+          <h4>โชว์การกันพลาด</h4>
+          <p>ถอดสาย ESP32 → dashboard สลับเป็น <b>mock data</b> พร้อมแบนเนอร์แจ้งเตือน ไม่พัง ไม่หน้าว่าง</p>
+        </div>
+      </div>
+      <div class="pres-step">
+        <div class="big">6</div>
+        <div>
+          <h4>ปิดด้วยการต่อยอด</h4>
+          <p>"ต่อไปเพิ่ม <b>relay ควบคุมระบบน้ำอัตโนมัติ</b> เก็บประวัติลง <b>database</b> และแจ้งเตือนผ่าน <b>Line</b> ได้"</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn reveal" style="margin-top:20px;">
+      <span class="t">คำถามที่ผู้ชมมักถาม</span>
+      <b>"ข้อมูลแม่นไหม?"</b> — ค่ามาจากเซ็นเซอร์จริงผ่าน Modbus; backend mock ใช้สำหรับสาธิตบนคลาวด์เท่านั้น &nbsp;·&nbsp;
+      <b>"รองรับกี่แปลง?"</b> — ตอนนี้ออกแบบมาสำหรับเซ็นเซอร์ชุดเดียว ต่อยอดเพิ่ม node ได้โดยใช้ Modbus ID ต่างกัน &nbsp;·&nbsp;
+      <b>"ใช้อินเทอร์เน็ตไหม?"</b> — ไม่จำเป็น ESP32 เสิร์ฟเว็บเองในเครือข่ายท้องถิ่น
+    </div>
+  </section>
+
+  <!-- ═══════════ Footer ═══════════ -->
+  <footer class="reveal">
+    <p>Agriscan · ระบบ IoT ตรวจวัดค่าดินแบบ Real-time · เอกสารประกอบการนำเสนอ</p>
+    <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+// ─── Flow diagram: ไล่สถานะทีละโหนด + อัปเดต readout แบบ live ───
+const NODES = document.querySelectorAll('#flow .flow-node');
+const READOUT = document.getElementById('readout');
+
+const VALUE_SETS = [
+  { moisture: 45.2, temperature: 28.5, ec: 320, ph: 6.8, n: 45, p: 32, k: 89 },
+  { moisture: 38.7, temperature: 30.1, ec: 410, ph: 6.2, n: 58, p: 41, k: 112 },
+  { moisture: 62.4, temperature: 26.9, ec: 285, ph: 7.1, n: 36, p: 27, k: 78 },
+  { moisture: 27.9, temperature: 33.4, ec: 860, ph: 5.1, n: 23, p: 18, k: 65 }
+];
+let setIdx = 0, step = 0;
+
+function formatLines(d) {
+  return [
+    '┌────────────────────────────────┐',
+    `│ ความชื้น    : ${d.moisture.toFixed(1).padStart(6)} %`,
+    `│ อุณหภูมิ    : ${d.temperature.toFixed(1).padStart(6)} °C`,
+    `│ EC          : ${String(d.ec).padStart(6)} µS/cm`,
+    `│ pH          : ${d.ph.toFixed(1).padStart(6)}`,
+    `│ N           : ${String(d.n).padStart(6)} mg/kg`,
+    `│ P           : ${String(d.p).padStart(6)} mg/kg`,
+    `│ K           : ${String(d.k).padStart(6)} mg/kg`,
+    '└────────────────────────────────┘'
+  ].join('\n');
+}
+
+function tick() {
+  NODES.forEach((n, i) => n.classList.toggle('active', i === step));
+
+  const d = VALUE_SETS[setIdx];
+  let lines = formatLines(d);
+
+  if (step === 0) lines = '🌱 [Sensor]  อ่านค่า 7 อย่างจาก Holding Registers 0x0000–0x0006\n' + lines;
+  else if (step === 1) lines = '🔌 [RS485 Modbus]  ส่งข้อมูล 9600 baud ผ่านสาย 2 เส้น → ESP32 ✓';
+  else if (step === 2) lines = '⚙️ [ESP32]  แปลง raw → หน่วยจริง และสร้าง JSON:\n' + lines;
+  else if (step === 3) lines = '📶 [WiFi]  กำลังส่ง: http://agriscan.local/data (GET /data)\n' + lines;
+  else lines = '🖥️ [Dashboard]  แสดงผล + วิเคราะห์: ' + statusLine(d);
+
+  READOUT.innerHTML = lines.split('\n').map(l => '<span class="' + (l.startsWith('│') || l.startsWith('┌') || l.startsWith('└') ? 'dim' : '') + '">' + l + '</span>').join('\n');
+
+  step++;
+  if (step > 4) { step = 0; setIdx = (setIdx + 1) % VALUE_SETS.length; }
+}
+
+function statusLine(d) {
+  const notes = [];
+  if (d.moisture < 30) notes.push('⚠ ดินแห้ง — ควรรดน้ำ');
+  if (d.ph < 5.5) notes.push('⚠ ดินเป็นกรด — ใส่ปูนขาว');
+  if (d.n < 50) notes.push('⚠ N ต่ำ — ใส่ปุ๋ย 46-0-0');
+  if (d.ec > 2000) notes.push('⚠ เกลือสูง');
+  if (!notes.length) notes.push('✓ อยู่ในเกณฑ์ปกติ');
+  return notes.join(' · ');
+}
+
+tick();
+setInterval(tick, 2200);
+
+// ─── Scroll reveal ───
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
