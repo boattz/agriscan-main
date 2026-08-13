@@ -102,6 +102,11 @@ cd backend && python app.py          # http://localhost:5000
 | `GET /health` | — | ตรวจสถานะ service + ฐานข้อมูล |
 | `GET /` | — | เสิร์ฟหน้า dashboard |
 
+## เอกสารประกอบ
+
+- `agriscan-presentation.html` — เอกสารนำเสนอโปรเจกต์ฉบับสมบูรณ์ (เปิดในเบราว์เซอร์)
+- `agriscan-code-guide.html` — คู่มืออธิบายโค้ดทุกส่วน: ภาษา, สแตก, workflow, อธิบายทีละไฟล์ (เปิดในเบราว์เซอร์)
+
 ## หมายเหตุ
 
 - **ไม่มี mock data แล้ว** — ถ้ายังไม่มีข้อมูล หน้าเว็บจะแสดงสถานะ offline จนกว่า ESP32 จะส่งค่ามา

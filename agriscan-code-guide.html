@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agriscan — คู่มืออธิบายโค้ด ตั้งแต่ 0 ถึง 100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --green-100:#dcfce7; --green-200:#bbf7d0; --green-300:#86efac;
+    --green-400:#4ade80; --green-500:#22c55e; --green-600:#16a34a;
+    --green-800:#166534; --green-950:#052e16;
+    --teal-400:#2dd4bf; --teal-500:#14b8a6; --teal-600:#0d9488;
+    --amber-400:#fbbf24; --amber-500:#f59e0b;
+    --red-400:#f87171; --red-500:#ef4444;
+    --blue-400:#60a5fa; --blue-500:#3b82f6;
+    --purple-400:#c084fc;
+    --bg-base:#0a1a12; --bg-card:#0f2418; --bg-card-2:#122b1e;
+    --bg-glass:rgba(22,101,52,0.18);
+    --border-dim:rgba(34,197,94,0.15); --border-glow:rgba(34,197,94,0.45);
+    --text-primary:#e2fce9; --text-secondary:#93c9a5; --text-muted:#4e7860;
+    --shadow-card:0 4px 24px rgba(0,0,0,0.5);
+    --radius-card:18px; --radius-pill:999px;
+    --font-body:'Prompt',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary);
+    min-height:100vh; overflow-x:hidden; line-height:1.65;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(22,163,74,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(13,148,136,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 40%, rgba(74,222,128,0.04) 0%, transparent 50%);
+  }
+  .page { position:relative; z-index:1; max-width:1020px; margin:0 auto; padding:0 20px 80px; }
+
+  .topnav { position:sticky; top:0; z-index:50; background:rgba(10,26,18,0.88); backdrop-filter:blur(12px); border-bottom:1px solid var(--border-dim); }
+  .topnav-inner { max-width:1020px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .topnav .brand { font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:8px; }
+  .topnav .brand-dot { width:10px; height:10px; border-radius:50%; background:var(--green-400); box-shadow:0 0 10px var(--green-400); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1; box-shadow:0 0 0 0 rgba(34,197,94,0.5);} 50%{opacity:.7; box-shadow:0 0 0 6px rgba(34,197,94,0);} }
+  .topnav a { color:var(--text-secondary); text-decoration:none; font-size:0.76rem; padding:4px 2px; border-bottom:2px solid transparent; transition:all .2s; }
+  .topnav a:hover { color:var(--green-300); border-color:var(--border-glow); }
+  .topnav-links { display:flex; gap:14px; flex-wrap:wrap; }
+
+  .hero { padding:60px 0 36px; }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:8px; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--teal-400);
+    border:1px solid rgba(13,148,136,0.3); background:rgba(13,148,136,0.1);
+    padding:6px 14px; border-radius:var(--radius-pill); margin-bottom:22px;
+  }
+  .hero h1 { font-size:clamp(2rem, 6vw, 3.2rem); font-weight:700; line-height:1.15; letter-spacing:-0.5px; }
+  .hero h1 .grad { background:linear-gradient(90deg, var(--green-400), var(--teal-400)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero .lead { margin-top:18px; font-size:clamp(1rem, 2.5vw, 1.15rem); color:var(--text-secondary); max-width:700px; font-weight:300; }
+
+  section { margin-top:72px; }
+  .sec-head { margin-bottom:24px; }
+  .sec-num { font-family:var(--font-mono); font-size:0.72rem; font-weight:600; color:var(--teal-400); letter-spacing:0.1em; display:block; margin-bottom:8px; }
+  .sec-head h2 { font-size:clamp(1.4rem, 4vw, 1.85rem); font-weight:700; letter-spacing:-0.3px; display:flex; align-items:center; gap:12px; }
+  .sec-head h2::after { content:''; flex:1; height:1px; background:var(--border-dim); }
+  .sec-head p { color:var(--text-secondary); margin-top:8px; font-size:0.92rem; font-weight:300; max-width:780px; }
+  .sub-label { font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin:24px 0 10px; }
+
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:16px; }
+  .card {
+    background:var(--bg-card); border:1px solid var(--border-dim);
+    border-radius:var(--radius-card); padding:20px 22px; box-shadow:var(--shadow-card);
+    position:relative; overflow:hidden; transition:transform .25s ease, border-color .25s ease;
+  }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--card-accent, linear-gradient(90deg,var(--green-500),var(--teal-500))); opacity:.7; }
+  .card:hover { transform:translateY(-3px); border-color:var(--border-glow); }
+  .card .c-label { font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+  .card .c-title { font-size:1rem; font-weight:600; margin-bottom:6px; }
+  .card .c-desc { font-size:0.82rem; color:var(--text-secondary); font-weight:300; }
+  .card .c-big { font-family:var(--font-mono); font-size:1.35rem; font-weight:600; color:var(--green-300); line-height:1.3; }
+
+  .table-wrap { background:var(--bg-card); border:1px solid var(--border-dim); border-radius:var(--radius-card); overflow-x:auto; box-shadow:var(--shadow-card); }
+  table { width:100%; border-collapse:collapse; font-size:0.84rem; min-width:560px; }
+  thead th {
+    text-align:left; font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--text-muted); padding:13px 18px; border-bottom:1px solid var(--border-dim);
+    background:rgba(22,101,52,0.15);
+  }
+  tbody td { padding:12px 18px; border-bottom:1px solid rgba(34,197,94,0.08); vertical-align:top; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover { background:rgba(34,197,94,0.05); }
+  td .mono, td.mono { font-family:var(--font-mono); font-size:0.78rem; color:var(--green-300); }
+  .pill { display:inline-block; font-size:0.66rem; font-weight:600; padding:3px 10px; border-radius:var(--radius-pill); white-space:nowrap; }
+  .pill.green { background:rgba(34,197,94,0.12); color:var(--green-400); }
+  .pill.teal  { background:rgba(20,184,166,0.12); color:var(--teal-400); }
+  .pill.amber { background:rgba(251,191,36,0.12); color:var(--amber-400); }
+  .pill.red   { background:rgba(239,68,68,0.12); color:var(--red-400); }
+  .pill.blue  { background:rgba(59,130,246,0.12); color:var(--blue-400); }
+  .pill.purple{ background:rgba(168,85,247,0.14); color:var(--purple-400); }
+
+  pre {
+    background:rgba(0,0,0,0.42); border:1px solid var(--border-dim); border-radius:14px;
+    padding:18px 20px; overflow-x:auto; font-family:var(--font-mono); font-size:0.76rem;
+    line-height:1.75; color:var(--text-secondary); margin:14px 0;
+  }
+  pre .c { color:var(--text-muted); }
+  pre .k { color:var(--teal-400); }
+  pre .s { color:var(--amber-400); }
+  pre .n { color:var(--green-300); }
+  pre .hl { background:rgba(34,197,94,0.12); outline:1px solid rgba(34,197,94,0.25); border-radius:4px; }
+  code.inline {
+    font-family:var(--font-mono); font-size:0.77rem; background:rgba(34,197,94,0.1);
+    border:1px solid var(--border-dim); color:var(--green-300); padding:1px 7px; border-radius:6px;
+  }
+
+  ul.check { list-style:none; }
+  ul.check li { position:relative; padding-left:26px; margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary); font-weight:300; }
+  ul.check li::before { content:'✓'; position:absolute; left:0; top:1px; color:var(--green-400); font-weight:700; font-size:0.9rem; }
+  ul.check li b { color:var(--text-primary); font-weight:600; }
+
+  .callout { border-radius:14px; padding:16px 20px; margin:18px 0; border:1px solid; font-size:0.85rem; }
+  .callout.warn { background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.25); color:var(--amber-400); }
+  .callout.info { background:rgba(59,130,246,0.06); border-color:rgba(59,130,246,0.22); color:var(--blue-400); }
+  .callout.ok   { background:rgba(34,197,94,0.06); border-color:rgba(34,197,94,0.2); color:var(--green-300); }
+  .callout b { color:inherit; }
+  .callout .t { display:block; font-weight:600; margin-bottom:4px; font-size:0.78rem; letter-spacing:0.04em; text-transform:uppercase; opacity:.85; }
+
+  /* Workflow diagram */
+  .wf { display:flex; flex-direction:column; gap:0; }
+  .wf-step {
+    display:flex; gap:16px; align-items:flex-start; padding:14px 0;
+    border-bottom:1px dashed rgba(34,197,94,0.15);
+  }
+  .wf-step:last-child { border-bottom:none; }
+  .wf-step .wf-no {
+    font-family:var(--font-mono); font-weight:700; color:var(--teal-400); font-size:0.9rem;
+    width:32px; height:32px; flex-shrink:0; display:grid; place-items:center;
+    border:1px solid rgba(20,184,166,0.35); border-radius:10px; background:rgba(13,148,136,0.08);
+  }
+  .wf-step h4 { font-size:0.92rem; font-weight:600; margin-bottom:2px; }
+  .wf-step p { font-size:0.83rem; color:var(--text-secondary); font-weight:300; }
+  .wf-step p b { color:var(--text-primary); font-weight:600; }
+  .wf-step code { font-size:0.76rem; }
+
+  .reveal { opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity:1; transform:none; }
+
+  footer { margin-top:80px; padding-top:24px; border-top:1px solid var(--border-dim); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  footer p { font-size:0.74rem; color:var(--text-muted); }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:9px 20px; border-radius:var(--radius-pill); border:1px solid var(--border-glow); background:rgba(22,101,52,0.3); color:var(--green-300); font-family:var(--font-body); font-size:0.82rem; cursor:pointer; text-decoration:none; transition:all .2s; }
+  .btn:hover { background:rgba(22,101,52,0.5); box-shadow:0 0 20px rgba(34,197,94,0.2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+    .reveal { opacity:1; transform:none; }
+  }
+  @media print {
+    body { background:#fff; color:#000; }
+    body::before, .topnav, .btn { display:none !important; }
+    .card, .table-wrap, pre { box-shadow:none; background:#fff; border-color:#ccc; }
+    .card .c-desc, .wf-step p, .sec-head p, ul.check li { color:#333; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="brand"><span class="brand-dot"></span>Agriscan · Code Guide</span>
+    <div class="topnav-links">
+      <a href="#lang">ภาษา</a>
+      <a href="#stack">สแตก</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#esp32">ESP32 (C++)</a>
+      <a href="#dashboard">Dashboard (JS)</a>
+      <a href="#backend">Backend (Python)</a>
+      <a href="#deploy">Deploy</a>
+      <a href="#callflow">เส้นทาง Request</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <header class="hero reveal">
+    <span class="eyebrow">● คู่มืออธิบายโค้ด — ใช้ประกอบการนำเสนอ</span>
+    <h1>Agriscan <span class="grad">โค้ดทำงานยังไง?</span></h1>
+    <p class="lead">
+      เอกสารนี้อธิบาย <b>ทุกส่วนของโค้ด</b> ในโปรเจกต์ — ใช้อะไรเป็นภาษา ใช้สแตกอะไร มี workflow อย่างไร
+      และแต่ละไฟล์ทำงานอย่างไรทีละบรรทัด เริ่มจาก ESP32 (C++) → Dashboard (HTML/CSS/JS) → Backend (Python/Flask) → Deploy (Render)
+    </p>
+  </header>
+
+  <!-- ═══════════ 01 ภาษาที่ใช้ ═══════════ -->
+  <section id="lang">
+    <div class="sec-head reveal">
+      <span class="sec-num">01 — ภาษา</span>
+      <h2>โปรเจกต์นี้ใช้ภาษาอะไรบ้าง?</h2>
+      <p>ทั้งหมด 5 ภาษา แต่ละภาษาทำหน้าที่ของตัวเอง คนละชั้น คนละงาน</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>ภาษา</th><th>ใช้ที่ไหน</th><th>ทำหน้าที่อะไร</th><th>ระดับ</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>C++</b> (Arduino)</td>
+            <td class="mono">esp32/agriscan/agriscan.ino</td>
+            <td>สั่งงานฮาร์ดแวร์โดยตรง: อ่านเซนเซอร์ RS485, เชื่อม WiFi, รันเว็บ, ส่งข้อมูลขึ้นคลาวด์</td>
+            <td><span class="pill teal">ใกล้ฮาร์ดแวร์</span></td>
+          </tr>
+          <tr>
+            <td><b>HTML</b></td>
+            <td class="mono">dashboard/index.html</td>
+            <td>โครงสร้างของหน้าเว็บ — วางการ์ดเซ็นเซอร์, ปุ่ม, แบนเนอร์</td>
+            <td><span class="pill blue">โครงสร้าง</span></td>
+          </tr>
+          <tr>
+            <td><b>CSS</b></td>
+            <td class="mono">dashboard/style.css</td>
+            <td>ตกแต่งหน้าตา — ธีมเขียวเข้ม, การ์ดกระจก, แอนิเมชัน, responsive</td>
+            <td><span class="pill blue">หน้าตา</span></td>
+          </tr>
+          <tr>
+            <td><b>JavaScript</b></td>
+            <td class="mono">dashboard/script.js</td>
+            <td>สมองฝั่งเว็บ — ดึงข้อมูลทุก 5 วิ, ไล่หาแหล่งข้อมูล, คำนวณคำแนะนำ, อัปเดตหน้าจอ</td>
+            <td><span class="pill amber">สมองฝั่ง client</span></td>
+          </tr>
+          <tr>
+            <td><b>Python</b> (Flask)</td>
+            <td class="mono">backend/app.py</td>
+            <td>สมองฝั่ง server — รับค่าจาก ESP32, เก็บลง PostgreSQL, เสิร์ฟหน้าเว็บและ API</td>
+            <td><span class="pill red">สมองฝั่ง server</span></td>
+          </tr>
+          <tr>
+            <td><b>YAML</b></td>
+            <td class="mono">render.yaml</td>
+            <td>ตั้งค่า deploy บน Render — บอกให้สร้างเว็บ + ฐานข้อมูลอัตโนมัติ</td>
+            <td><span class="pill purple">ตั้งค่า</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout info reveal">
+      <span class="t">กฎเหล็กของโปรเจกต์</span>
+      Dashboard เป็น <b>Vanilla HTML/CSS/JS</b> — ไม่มี framework (React, Vue ฯลฯ) และไม่มี build step: เปิดไฟล์ .html ได้เลยทันที ทุกอย่างอ่านแล้วเข้าใจได้ ไม่มีของที่ถูก "ซ่อน" ไว้
+    </div>
+  </section>
+
+  <!-- ═══════════ 02 สแตก ═══════════ -->
+  <section id="stack">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 — สแตก</span>
+      <h2>Stack เต็มรูปแบบ</h2>
+      <p>ตั้งแต่ฮาร์ดแวร์จนถึงคลาวด์ — เครื่องมือแต่ละตัวเลือกมาเพราะใช้งานง่ายและฟรี</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>ชั้น</th><th>เทคโนโลยี</th><th>เวอร์ชัน/รุ่น</th><th>บทบาท</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>ฮาร์ดแวร์</b></td><td>ESP32 + เซ็นเซอร์ 7-in-1 + MAX485</td><td class="mono">—</td><td>อ่านค่าดิน, สื่อสาร RS485</td></tr>
+          <tr><td><b>Firmware</b></td><td>Arduino C++ · ModbusMaster</td><td class="mono">—</td><td>ควบคุมฮาร์ดแวร์, WebServer, WiFi, mDNS</td></tr>
+          <tr><td><b>Frontend</b></td><td>HTML + CSS + Vanilla JS</td><td class="mono">—</td><td>แสดงผล + วิเคราะห์ + fallback chain</td></tr>
+          <tr><td><b>Backend</b></td><td>Python · Flask</td><td class="mono">Flask 3.0.3</td><td>API รับค่า + เสิร์ฟหน้าเว็บ</td></tr>
+          <tr><td><b>Database</b></td><td>PostgreSQL (prod) / SQLite (local)</td><td class="mono">psycopg 3.3</td><td>เก็บประวัติค่าจากเซ็นเซอร์</td></tr>
+          <tr><td><b>Server</b></td><td>gunicorn (WSGI)</td><td class="mono">22.0.0</td><td>รัน Flask ใน production</td></tr>
+          <tr><td><b>Hosting</b></td><td>Render.com (free tier)</td><td class="mono">Python 3.10</td><td>โฮสต์เว็บ + ฐานข้อมูลบนคลาวด์</td></tr>
+          <tr><td><b>การสื่อสาร</b></td><td>HTTP/HTTPS · JSON · CORS</td><td class="mono">—</td><td>ESP32 ↔ Cloud ↔ Browser</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════ 03 Workflow ═══════════ -->
+  <section id="workflow">
+    <div class="sec-head reveal">
+      <span class="sec-num">03 — Workflow</span>
+      <h2>ภาพรวม workflow ของทั้งระบบ</h2>
+      <p>ข้อมูลเดินทางจากดิน → ชิป → อินเทอร์เน็ต → ฐานข้อมูล → หน้าจอผู้ใช้ ตามลำดับนี้</p>
+    </div>
+    <div class="card reveal" style="padding:8px 22px; --card-accent:linear-gradient(90deg,#22c55e,#2dd4bf);">
+      <div class="wf">
+        <div class="wf-step">
+          <div class="wf-no">1</div>
+          <div>
+            <h4>🌱 เซ็นเซอร์วัดค่า</h4>
+            <p>เซ็นเซอร์ 7-in-1 อ่านค่าดิน 7 อย่าง พร้อมรับคำสั่งผ่านสาย RS485 (Modbus RTU, slave ID 1)</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-no">2</div>
+          <div>
+            <h4>🔌 ESP32 อ่านค่า (C++)</h4>
+            <p><code class="inline">loop()</code> ส่งคำสั่ง <code class="inline">readHoldingRegisters(0x0000, 7)</code> ทุก 5 วินาที → แปลง raw เป็นหน่วยจริง (เช่น ÷10)</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-no">3</div>
+          <div>
+            <h4>⚙️ ESP32 ทำ 2 หน้าที่พร้อมกัน</h4>
+            <p><b>เสิร์ฟ local:</b> ตอบ <code class="inline">GET /data</code> ให้คนในบ้าน/ไร่ · <b>ส่งคลาวด์:</b> <code class="inline">POST /api/readings</code> (HTTPS) ทุก 1 นาที</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-no">4</div>
+          <div>
+            <h4>☁️ Flask รับและเก็บ (Python)</h4>
+            <p>ตรวจ <code class="inline">X-API-Key</code> → <code class="inline">INSERT</code> เข้า PostgreSQL → ตอบ <code class="inline">201</code></p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-no">5</div>
+          <div>
+            <h4>🖥️ Dashboard ดึงและแสดง (JS)</h4>
+            <p>poll <code class="inline">GET /api/latest</code> ทุก 5 วินาที → อัปเดตการ์ด + คำนวณคำแนะนำอัตโนมัติ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout ok reveal">
+      <span class="t">หัวใจของ workflow</span>
+      ระบบเป็นแบบ <b>ESP32 เป็นผู้ส่ง (push)</b> ไม่ใช่ dashboard เป็นผู้ไปขอ (poll) จาก ESP32 — เพราะ ESP32 อยู่ในเครือข่ายบ้าน/ไร่ ไม่มี IP สาธารณะ จึง "ส่งออก" ไปหาคลาวด์เอง แล้วคนดูค่อยมาอ่านจากคลาวด์ กลับทิศทางนี้ทำให้<b>ดูได้จากทุกที่</b>
+    </div>
+  </section>
+
+  <!-- ═══════════ 04 ESP32 Firmware ═══════════ -->
+  <section id="esp32">
+    <div class="sec-head reveal">
+      <span class="sec-num">04 — ESP32 Firmware (ภาษา C++)</span>
+      <h2>agriscan.ino — อธิบายทีละส่วน</h2>
+      <p>โค้ดเดียวที่รันบนชิป ทำ 4 หน้าที่: อ่านเซนเซอร์, เสิร์ฟเว็บ local, ส่งคลาวด์, ทนทานต่อความผิดพลาด</p>
+    </div>
+
+    <div class="sub-label reveal">โครงสร้าง 2 ฟังก์ชันหลัก (กฎของ Arduino)</div>
+    <pre class="reveal"><span class="k">void</span> setup() { <span class="c">/* รันครั้งเดียวตอนเปิดเครื่อง */</span> }
+<span class="k">void</span> loop()  { <span class="c">/* รันซ้ำ ๆ ตลอดไป */</span> }</pre>
+
+    <div class="sub-label reveal">① ยืมไลบรารี (include)</div>
+<pre class="reveal"><span class="k">#include</span> <span class="s">&lt;ModbusMaster.h&gt;</span>     <span class="c">// ไลบรารีสำหรับคุยกับเซนเซอร์ RS485</span>
+<span class="k">#include</span> <span class="s">&lt;WiFi.h&gt;</span>             <span class="c">// เชื่อม WiFi</span>
+<span class="k">#include</span> <span class="s">&lt;WebServer.h&gt;</span>        <span class="c">// ทำเว็บเซิร์ฟเวอร์</span>
+<span class="k">#include</span> <span class="s">&lt;HTTPClient.h&gt;</span>       <span class="c">// ส่ง HTTP ขึ้นคลาวด์</span>
+<span class="k">#include</span> <span class="s">&lt;WiFiClientSecure.h&gt;</span> <span class="c">// HTTPS (เข้ารหัส)</span>
+<span class="k">#include</span> <span class="s">&lt;ESPmDNS.h&gt;</span>          <span class="c">// ชื่อ agriscan.local</span></pre>
+    <p class="reveal" style="font-size:0.8rem; color:var(--text-muted);">เหมือนเปิดตู้ยืมเครื่องมือ: <code class="inline">&lt;ModbusMaster.h&gt;</code> = คู่มือคุยกับเซนเซอร์, <code class="inline">&lt;WebServer.h&gt;</code> = ชุดทำเว็บ เป็นต้น</p>
+
+    <div class="sub-label reveal">② ตั้งค่าคงที่ — ป้ายชื่อแทนตัวเลข</div>
+<pre class="reveal"><span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;       <span class="c">// ชื่อ WiFi</span>
+<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://...onrender.com/api/readings"</span>; <span class="c">// ปลายทางคลาวด์</span>
+<span class="k">const char</span>* API_KEY   = <span class="s">"..."</span>;                  <span class="c">// รหัสยืนยันตัวตน</span>
+<span class="k">#define</span> RXD2   16      <span class="c">// ขา 16 = ขารับข้อมูล RS485</span>
+<span class="k">#define</span> BAUD_RATE 4800 <span class="c">// ความเร็วคุยกับเซนเซอร์</span></pre>
+
+    <div class="sub-label reveal">③ ฟังก์ชัน readSensor() — สั่งเซนเซอร์วัดค่า</div>
+<pre class="reveal">SoilData readSensor() {
+  <span class="c">// สั่งอ่าน Holding Registers 0x0000 จำนวน 7 ตัวในครั้งเดียว</span>
+  <span class="hl">node.readHoldingRegisters(0x0000, 7);</span>
+  <span class="c">// แปลง raw → หน่วยจริง (เซนเซอร์ส่งค่ามา ×10)</span>
+  d.moisture    = buf[0] / 10.0;          <span class="c">// ความชื้น %</span>
+  d.temperature = (int16_t)buf[1] / 10.0; <span class="c">// อุณหภูมิ °C (int16 รองรับค่าลบ)</span>
+  d.ec          = buf[2];                 <span class="c">// EC µS/cm</span>
+  d.ph          = buf[3] / 10.0;          <span class="c">// pH</span>
+  d.n           = buf[4];                 <span class="c">// N mg/kg</span>
+  d.p           = buf[5];                 <span class="c">// P mg/kg</span>
+  d.k           = buf[6];                 <span class="c">// K mg/kg</span>
+}</pre>
+
+    <div class="sub-label reveal">④ setup() — เตรียมเครื่องครั้งเดียว</div>
+<pre class="reveal"><span class="k">void</span> setup() {
+  Serial.begin(115200);                 <span class="c">// เปิดจอคอมสำหรับ debug (Serial Monitor)</span>
+  WiFi.mode(WIFI_STA);                  <span class="c">// โหมด WiFi client</span>
+  connectWiFi();                        <span class="c">// ต่อ WiFi (ลอง 20 ครั้ง ครั้งละ 0.5 วิ)</span>
+  MDNS.begin(<span class="s">"agriscan"</span>);            <span class="c">// ตั้งชื่อ http://agriscan.local</span>
+  server.on(<span class="s">"/"</span>, ...);               <span class="c">// เส้นทางเว็บ: หน้า dashboard</span>
+  server.on(<span class="s">"/data"</span>, handleData);    <span class="c">// เส้นทางเว็บ: ส่งค่า JSON</span>
+  Serial2.begin(4800, SERIAL_8N1, 16, 17); <span class="c">// เปิดพอร์ตคุยกับเซนเซอร์</span>
+  node.begin(1, Serial2);               <span class="c">// ตั้งค่า Modbus slave ID = 1</span>
+}</pre>
+
+    <div class="sub-label reveal">⑤ loop() — วงจรทำงานซ้ำ (หัวใจของระบบ)</div>
+<pre class="reveal"><span class="k">void</span> loop() {
+  server.handleClient();   <span class="c">// 1. รับคำขอจากเว็บ (ตอบได้ตลอดเวลา)</span>
+
+  checkWiFi();             <span class="c">// 2. WiFi หลุดไหม? ถ้าหลุด reconnect อัตโนมัติ</span>
+
+  <span class="c">// 3. อ่านเซนเซอร์ทุก 5 วินาที</span>
+  <span class="k">if</span> (millis() - lastRead &gt;= 5000) {
+    SoilData d = readSensor();
+    <span class="k">if</span> (d.valid) lastData = d;   <span class="c">// สำเร็จ → เก็บค่า</span>
+    <span class="c">// ไม่สำเร็จ → ใช้ค่าเดิม (ระบบทนทาน)</span>
+  }
+
+  <span class="c">// 4. ส่งคลาวด์ทุก 1 นาที</span>
+  <span class="k">if</span> (millis() - lastUpload &gt;= 60000) {
+    uploadReading();       <span class="c">// POST ไป Render</span>
+  }
+}</pre>
+
+    <div class="sub-label reveal">⑥ uploadReading() — ส่งค่าขึ้นคลาวด์</div>
+<pre class="reveal"><span class="k">void</span> uploadReading() {
+  WiFiClientSecure client;   <span class="c">// สาย HTTPS</span>
+  client.setInsecure();      <span class="c">// ไม่ตรวจใบรับรอง (พอสำหรับงานสาธิต)</span>
+  http.addHeader(<span class="s">"X-API-Key"</span>, API_KEY); <span class="c">// ใส่รหัสยืนยันตัวตน</span>
+  <span class="hl">int code = http.POST(body);</span>   <span class="c">// ส่ง JSON ไปยัง /api/readings</span>
+  <span class="c">// code 201 = สำเร็จ · อื่น ๆ = ล้มเหลว (ลองใหม่รอบถัดไป)</span>
+}</pre>
+
+    <div class="callout ok reveal">
+      <span class="t">เทคนิคที่น่าสนใจในโค้ดนี้</span>
+      <b>ใช้ค่าเดิมเมื่ออ่านไม่ได้</b> — ถ้า Modbus ล้มเหลวชั่วคราว (สัญญาณรบกวน, สายหลวม) ระบบไม่พัง แต่แสดงค่าล่าสุดที่อ่านได้ และ <b>WiFi auto-reconnect</b> ทำให้ฝังไว้ในไร่ได้โดยไม่ต้องไปรีเซ็ต
+    </div>
+  </section>
+
+  <!-- ═══════════ 05 Dashboard ═══════════ -->
+  <section id="dashboard">
+    <div class="sec-head reveal">
+      <span class="sec-num">05 — Dashboard (HTML/CSS/JS)</span>
+      <h2>script.js — สมองของหน้าเว็บ</h2>
+      <p>3 ไฟล์ แยกหน้าที่: index.html = โครงสร้าง, style.css = หน้าตา, script.js = พฤติกรรม (โฟกัสที่ script.js เพราะเป็นสมอง)</p>
+    </div>
+
+    <div class="grid3 reveal">
+      <div class="card">
+        <div class="c-label">index.html</div>
+        <div class="c-title">โครงสร้าง</div>
+        <div class="c-desc">วางการ์ด 5 ใบ (ความชื้น/อุณหภูมิ/EC/pH/NPK), header, banner, ปุ่มรีเฟรช — ทุก element มี <code class="inline">id</code> ให้ JS เรียกใช้</div>
+      </div>
+      <div class="card">
+        <div class="c-label">style.css</div>
+        <div class="c-title">หน้าตา</div>
+        <div class="c-desc">Design tokens ใน <code class="inline">:root</code> (สีเขียวทั้งชุด), การ์ดกระจก, แอนิเมชัน (กระพริบ, skeleton), responsive จนถึงมือถือ</div>
+      </div>
+      <div class="card">
+        <div class="c-label">script.js</div>
+        <div class="c-title">พฤติกรรม</div>
+        <div class="c-desc">ดึงข้อมูล, fallback chain 7 ระดับ, วิเคราะห์คำแนะนำ, อัปเดต UI — อธิบายด้านล่าง</div>
+      </div>
+    </div>
+
+    <div class="sub-label reveal">① CONFIG + state — ตั้งค่าและเก็บสถานะ</div>
+<pre class="reveal"><span class="k">const</span> CONFIG = {
+  interval:     5000,                    <span class="c">// poll ทุก 5 วินาที</span>
+  useMockOnFail: false,                  <span class="c">// ไม่มี mock data — แสดงข้อมูลจริงเท่านั้น</span>
+  cloudApiUrl:  <span class="s">'https://agriscan-backend-l4vu.onrender.com'</span>
+};
+
+<span class="k">let</span> state = { online: false, retryCount: 0, ... };  <span class="c">// ตัวแปรบอกสถานะระบบ</span></pre>
+
+    <div class="sub-label reveal">② fetchData() — ไล่หาข้อมูลตามลำดับ (fallback chain)</div>
+<pre class="reveal"><span class="k">async function</span> fetchData() {
+  <span class="k">const</span> candidates = [];
+  <span class="c">// 1. IP ที่ผู้ใช้ตั้งเอง (localStorage) → 2. URL ที่ใช้ได้ล่าสุด</span>
+  <span class="c">// 3. หน้าเว็บที่เปิดอยู่ → 4. คลาวด์ Render → 5. agriscan.local ...</span>
+
+  <span class="k">for</span> (<span class="k">const</span> url <span class="k">of</span> candidates) {
+    <span class="k">try</span> {
+      <span class="c">// AbortController = ตัด timeout 3 วินาที ไม่รอค้าง</span>
+      <span class="k">const</span> ctrl = <span class="k">new</span> AbortController();
+      <span class="k">const</span> res = <span class="k">await</span> fetch(url, { signal: ctrl.signal });
+      <span class="k">const</span> json = <span class="k">await</span> res.json();
+      updateUI(json);   <span class="c">// เจอแล้ว! วาดหน้าจอ</span>
+      <span class="k">break</span>;
+    } <span class="k">catch</span> (err) { <span class="c">/* ลอง URL ถัดไป */</span> }
+  }
+}</pre>
+
+    <div class="sub-label reveal">③ updateUI() + buildRecommendations() — วาดหน้าจอและแนะนำ</div>
+<pre class="reveal"><span class="k">function</span> updateUI(d) {
+  <span class="c">// ความชื้น: อัปเดตตัวเลข + กราฟแท่ง + สีเปลี่ยนตามสถานะ</span>
+  <span class="k">if</span> (d.moisture &lt; 30)      bar แดง → <span class="s">"ดินแห้ง ควรรดน้ำ"</span>
+  <span class="k">else if</span> (d.moisture &gt; 80) bar น้ำเงิน → <span class="s">"ชื้นเกินไป"</span>
+  <span class="k">else</span>                    bar เขียว → <span class="s">"ปกติ"</span>
+
+  <span class="c">// NPK: เทียบเกณฑ์กรมพัฒนาที่ดิน</span>
+  <span class="k">if</span> (d.p &lt; 10)  → <span class="s">"P ต่ำ"</span>      <span class="c">// ต่ำ &lt;10, ปานกลาง 10–25, สูง &gt;25</span>
+  <span class="k">if</span> (d.k &lt; 60)  → <span class="s">"K ต่ำ"</span>      <span class="c">// ต่ำ &lt;60, ปานกลาง 60–90, สูง &gt;90</span>
+
+  buildRecommendations(d);  <span class="c">// สร้างการ์ดคำแนะนำ (เช่น "ใส่ปุ๋ย 0-46-0")</span>
+}</pre>
+
+    <div class="sub-label reveal">④ ตัวช่วยอื่น ๆ</div>
+<pre class="reveal">setValue()   <span class="c">// ตั้งตัวเลข + เล่นแอนิเมชันกระพริบเมื่อค่าเปลี่ยน</span>
+animateBar() <span class="c">// ขยับกราฟแท่ง (moisture, NPK)</span>
+setChip()    <span class="c">// เปลี่ยนป้ายสถานะ (เขียว/เหลือง/แดง)</span>
+startPolling() <span class="c">// fetch ทันที + setInterval ทุก 5 วิ</span>
+visibilitychange → <span class="c">// กลับมาที่แท็บ = ลองเชื่อมใหม่ทันที</span></pre>
+
+    <div class="callout info reveal">
+      <span class="t">เวอร์ชันฝังใน ESP32</span>
+      หน้าเดียวกันถูกฝังเป็น <b>C++ string literal</b> ใน <code class="inline">dashboard.h</code> — ESP32 เสิร์ฟได้เองโดยไม่ต้องพึ่งคลาวด์ ต้องซิงค์ 2 ชุดนี้ด้วยมือ (เป็นข้อจำกัดที่รู้กัน)
+    </div>
+  </section>
+
+  <!-- ═══════════ 06 Backend ═══════════ -->
+  <section id="backend">
+    <div class="sec-head reveal">
+      <span class="sec-num">06 — Backend (ภาษา Python / Flask)</span>
+      <h2>app.py — อธิบายทีละส่วน</h2>
+      <p>Flask = framework ทำเว็บที่เล็กสุดใน Python — ไฟล์เดียวทั้งรับค่า เก็บฐานข้อมูล และเสิร์ฟหน้าเว็บ</p>
+    </div>
+
+    <div class="sub-label reveal">① เตรียม config — อ่านค่าจาก environment</div>
+<pre class="reveal"><span class="k">from</span> flask <span class="k">import</span> Flask, jsonify, request, send_from_directory
+<span class="k">from</span> flask_cors <span class="k">import</span> CORS
+
+API_KEY = os.environ.get(<span class="s">"API_KEY"</span>, <span class="s">"agriscan-dev-key"</span>)  <span class="c"># รหัสกันคนส่งปลอม</span>
+DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class="s">""</span>)       <span class="c"># บน Render = PostgreSQL</span></pre>
+
+    <div class="sub-label reveal">② ฐานข้อมูล — ใช้ได้ทั้ง 2 แบบอัตโนมัติ</div>
+<pre class="reveal"><span class="k">if</span> DATABASE_URL:
+    <span class="c"># มี URL → ใช้ PostgreSQL (บน Render)</span>
+    <span class="k">import</span> psycopg
+    PARAM = <span class="s">"%s"</span>
+<span class="k">else</span>:
+    <span class="c"># ไม่มี URL → ใช้ SQLite ไฟล์ (รันในเครื่อง dev)</span>
+    PARAM = <span class="s">"?"</span>
+
+<span class="k">def</span> get_conn():
+    <span class="k">return</span> psycopg.connect(DATABASE_URL) <span class="k">if</span> DATABASE_URL <span class="k">else</span> sqlite3.connect(<span class="s">"agriscan.db"</span>)</pre>
+
+    <div class="sub-label reveal">③ API — เส้นทางหลัก 3 เส้น</div>
+<pre class="reveal"><span class="k">@app.route</span>(<span class="s">"/api/readings"</span>, methods=[<span class="s">"POST"</span>])
+<span class="k">def</span> add_reading():
+    <span class="hl"><span class="k">if</span> request.headers.get(<span class="s">"X-API-Key"</span>) != API_KEY:</span>  <span class="c"># ตรวจรหัส</span>
+        <span class="k">return</span> jsonify(error), 401               <span class="c"># ไม่ตรง → ปฏิเสธ</span>
+    <span class="c"># INSERT ลงตาราง readings + commit</span>
+    <span class="k">return</span> jsonify({<span class="s">"success"</span>: True}), 201
+
+<span class="k">@app.route</span>(<span class="s">"/api/latest"</span>)
+<span class="k">def</span> latest():
+    <span class="c"># SELECT ... ORDER BY id DESC LIMIT 1 → ค่าล่าสุด</span>
+    <span class="k">return</span> jsonify(row)   <span class="c"># ยังไม่มีข้อมูล → 404</span>
+
+<span class="k">@app.route</span>(<span class="s">"/data"</span>)  <span class="c"># alias ของ /api/latest (dashboard เดิมใช้เส้นนี้)</span></pre>
+
+    <div class="sub-label reveal">④ หน้าเว็บ — เสิร์ฟจากโฟลเดอร์ dashboard</div>
+<pre class="reveal"><span class="k">@app.route</span>(<span class="s">"/"</span>)
+<span class="k">def</span> index():
+    <span class="k">return</span> send_from_directory(DASHBOARD_DIR, <span class="s">"index.html"</span>)  <span class="c"># หน้าแรก</span>
+
+<span class="k">@app.route</span>(<span class="s">"/&lt;path:path&gt;"</span>)
+<span class="k">def</span> static_files(path):
+    <span class="k">return</span> send_from_directory(DASHBOARD_DIR, path)  <span class="c"># style.css, script.js ...</span></pre>
+
+    <div class="callout ok reveal">
+      <span class="t">เทคนิคของ Flask ที่นี่</span>
+      เสิร์ฟ <b>หน้าเว็บและ API จาก server ตัวเดียวกัน</b> → dashboard กับข้อมูลอยู่ origin เดียวกัน ไม่มีปัญหา CORS ระหว่างเว็บกับ API เลย
+    </div>
+  </section>
+
+  <!-- ═══════════ 07 Deploy ═══════════ -->
+  <section id="deploy">
+    <div class="sec-head reveal">
+      <span class="sec-num">07 — Deployment (render.yaml)</span>
+      <h2>ขึ้นคลาวด์ยังไง? — เกือบไม่ต้องทำอะไร</h2>
+      <p>Render อ่านไฟล์ตั้งค่า <code class="inline">render.yaml</code> แล้วสร้างทุกอย่างให้อัตโนมัติ: เว็บ + ฐานข้อมูล + รหัสลับ</p>
+    </div>
+    <div class="grid2">
+      <div class="reveal">
+        <div class="sub-label">render.yaml — ประกาศสิ่งที่ต้องการ</div>
+<pre style="margin-top:0;"><span class="k">services</span>:
+  - <span class="k">type</span>: web
+    <span class="k">rootDir</span>: backend            <span class="c"># ไปรันที่โฟลเดอร์ backend</span>
+    <span class="k">startCommand</span>: gunicorn app:app  <span class="c"># รัน Flask ด้วย gunicorn</span>
+    <span class="k">envVars</span>:
+      - <span class="k">key</span>: API_KEY        <span class="c"># สุ่มให้อัตโนมัติ</span>
+      - <span class="k">key</span>: DATABASE_URL
+        <span class="k">fromDatabase</span>:
+          <span class="k">name</span>: agriscan-db  <span class="c"># ผูกกับฐานข้อมูลด้านล่าง</span>
+<span class="k">databases</span>:
+  - <span class="k">name</span>: agriscan-db
+    <span class="k">plan</span>: free</pre>
+      </div>
+      <div class="reveal">
+        <div class="sub-label">ขั้นตอนจริง (Blueprint)</div>
+        <ol style="padding-left:22px;">
+          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Push โค้ดขึ้น GitHub</li>
+          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render → <b>New → Blueprint</b> → เลือก repo</li>
+          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render สร้าง <b>Web Service + PostgreSQL</b> และสุ่ม <code class="inline">API_KEY</code> ให้</li>
+          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">ได้ URL เช่น <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> ใช้ได้ทันที</li>
+          <li style="font-size:0.87rem; color:var(--text-secondary);">เอา <code class="inline">API_KEY</code> ไปใส่ใน <code class="inline">agriscan.ino</code> → flash ESP32</li>
+        </ol>
+        <div class="callout info reveal" style="margin-top:14px;">
+          <span class="t">ทำไมต้อง gunicorn?</span>
+          Flask รันในตัว (dev server) ไม่เหมาะกับงานจริง — <b>gunicorn</b> คือเว็บเซิร์ฟเวอร์สำหรับ production ที่รัน Flask ได้เสถียร รองรับหลาย request พร้อมกัน
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 08 เส้นทาง Request ═══════════ -->
+  <section id="callflow">
+    <div class="sec-head reveal">
+      <span class="sec-num">08 — ตัวอย่างเส้นทางข้อมูล</span>
+      <h2>เกิดอะไรขึ้นในแต่ละฉาก?</h2>
+      <p>จำลอง 2 สถานการณ์จริงเพื่อให้เห็นภาพว่าโค้ดแต่ละส่วนถูกเรียกเมื่อไหร่</p>
+    </div>
+
+    <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 1 นาที)</div>
+<pre class="reveal"><span class="c">1. ESP32 (C++)</span>
+   loop() เห็นเวลาครบ 1 นาที → uploadReading()
+   → POST https://agriscan-backend-l4vu.onrender.com/api/readings
+     headers: X-API-Key, Content-Type: application/json
+     body: {"moisture":45.2, "temperature":28.5, ...}
+
+<span class="c">2. Flask (Python)</span>
+   add_reading() ตรวจ X-API-Key ตรง? → INSERT ลง PostgreSQL → ตอบ 201
+
+<span class="c">3. ฐานข้อมูล</span>
+   readings(id, moisture, temperature, ec, ph, n, p, k, valid, created_at) ← บรรทัดใหม่</pre>
+
+    <div class="sub-label reveal">ฉากที่ 2 — ผู้ใช้เปิด dashboard จากมือถือ</div>
+<pre class="reveal"><span class="c">1. Browser → GET https://...onrender.com/</span>
+   Flask เสิร์ฟ index.html + style.css + script.js
+
+<span class="c">2. script.js (JS) ทำงานทันที</span>
+   startPolling() → fetchData()
+   → ไล่ candidates: origin ของเว็บ = คลาวด์ → GET /api/latest
+
+<span class="c">3. Flask → SELECT ค่าล่าสุดจาก PostgreSQL → ส่ง JSON กลับ</span>
+
+<span class="c">4. script.js → updateUI() → วาดการ์ด + buildRecommendations()</span>
+   เช่น ความชื้น 45% → การ์ดเขียว "ปกติ" · P=32 → "P สูง" ตามเกณฑ์กรมฯ</pre>
+
+    <div class="callout warn reveal">
+      <span class="t">ถ้า ESP32 ยังไม่เคยส่งค่า</span>
+      <code class="inline">GET /api/latest</code> จะตอบ <b>404 "ยังไม่มีข้อมูล"</b> → dashboard แสดงสถานะ offline ตามจริง (ไม่มีการปลอมข้อมูล) และลองใหม่ทุก 5 วินาที
+    </div>
+  </section>
+
+  <footer class="reveal">
+    <p>Agriscan · คู่มืออธิบายโค้ด (แยกจากเอกสารนำเสนอ) · C++ + HTML/CSS/JS + Python/Flask + PostgreSQL</p>
+    <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+// Scroll reveal
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.05 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
