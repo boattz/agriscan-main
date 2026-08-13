@@ -433,13 +433,15 @@
     <h1>Agriscan<br /><span class="grad">ระบบ IoT ตรวจวัดค่าดินแบบ Real-time</span></h1>
     <p class="lead">
       ระบบอ่านค่าคุณภาพดิน 7 อย่างจากเซ็นเซอร์ RS485 Modbus ผ่าน ESP32
-      แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที พร้อมระบบแนะนำการดูแลดินอัตโนมัติ
+      ส่งข้อมูลจริงขึ้นคลาวด์ (Render + PostgreSQL) ทุก 1 นาที แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที
+      พร้อมระบบแนะนำการดูแลดินอัตโนมัติ — ดูได้จากทุกที่ ไม่มีข้อมูลจำลอง
     </p>
     <div class="tags">
       <span class="tag">🌱 IoT</span>
       <span class="tag">📡 RS485 Modbus</span>
       <span class="tag">⚙️ ESP32</span>
       <span class="tag">🖥️ Vanilla JS — ไม่มี Build Step</span>
+      <span class="tag">☁️ Cloud + PostgreSQL</span>
       <span class="tag">🇹🇭 UI ภาษาไทย</span>
     </div>
 
@@ -462,19 +464,19 @@
         <div class="flow-node" data-step="2">
           <div class="f-icon">⚙️</div>
           <div class="f-name">ESP32</div>
-          <div class="f-sub">อ่านค่า → สร้าง JSON → เสิร์ฟเว็บ</div>
+          <div class="f-sub">อ่านค่า → POST ขึ้นคลาวด์ + เสิร์ฟ local</div>
         </div>
         <div class="flow-conn"><span class="packet"></span></div>
         <div class="flow-node" data-step="3">
-          <div class="f-icon">📶</div>
-          <div class="f-name">WiFi</div>
-          <div class="f-sub">HTTP · mDNS: agriscan.local</div>
+          <div class="f-icon">☁️</div>
+          <div class="f-name">คลาวด์ Render</div>
+          <div class="f-sub">Flask API + PostgreSQL · HTTPS</div>
         </div>
         <div class="flow-conn"><span class="packet"></span></div>
         <div class="flow-node" data-step="4">
           <div class="f-icon">🖥️</div>
           <div class="f-name">Dashboard</div>
-          <div class="f-sub">ดึงข้อมูลทุก 5 วินาที</div>
+          <div class="f-sub">ดึงค่าจริงทุก 5 วินาที · ดูได้ทุกที่</div>
         </div>
       </div>
       <div class="flow-readout" id="readout"></div>
@@ -484,8 +486,8 @@
     <div class="stats">
       <div class="stat"><div class="v">7</div><div class="k">ค่าที่วัดได้</div></div>
       <div class="stat"><div class="v">5s</div><div class="k">รอบการอัปเดต</div></div>
-      <div class="stat"><div class="v">3</div><div class="k">องค์ประกอบหลัก</div></div>
-      <div class="stat"><div class="v">0</div><div class="k">Build Step / Framework</div></div>
+      <div class="stat"><div class="v">60s</div><div class="k">ส่งข้อมูลขึ้นคลาวด์</div></div>
+      <div class="stat"><div class="v">0</div><div class="k">Mock Data</div></div>
     </div>
   </header>
 
@@ -505,17 +507,17 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#14b8a6,#2dd4bf);">
         <div class="c-label">02 · ตัวกลาง</div>
         <div class="c-title">ESP32 ทำทุกอย่างในตัวเดียว</div>
-        <div class="c-desc">อ่านค่าเซ็นเซอร์, ตั้งชื่อตัวเองผ่าน mDNS, รัน Web Server และเสิร์ฟหน้า Dashboard เอง — ทำงานแบบ self-contained ไม่พึ่ง server ใด</div>
+        <div class="c-desc">อ่านค่าเซ็นเซอร์, เสิร์ฟหน้า Dashboard ในเครือข่ายท้องถิ่น และ POST ค่าจริงขึ้นคลาวด์ทุก 1 นาที (HTTPS + API key)</div>
       </div>
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">03 · การแสดงผล</div>
         <div class="c-title">Dashboard เว็บ + คำแนะนำ</div>
-        <div class="c-desc">หน้าเว็บ Vanilla HTML/CSS/JS ดึงข้อมูลทุก 5 วินาที แสดงการ์ดเซ็นเซอร์ 5 ใบ พร้อมวิเคราะห์และแนะนำการดูแลดินอัตโนมัติเป็นภาษาไทย</div>
+        <div class="c-desc">หน้าเว็บ Vanilla HTML/CSS/JS ดึงข้อมูลทุก 5 วินาที — เปิดบนคลาวด์ดูจากที่ไหนก็ได้ พร้อมวิเคราะห์และแนะนำการดูแลดินอัตโนมัติเป็นภาษาไทย</div>
       </div>
     </div>
     <div class="callout info reveal">
       <span class="t">เพิ่มเติม</span>
-      มี <b>Backend Flask</b> หนึ่งตัวที่สร้างข้อมูลจำลอง (mock data) ไว้สำหรับสาธิตบนคลาวด์ (Render.com) — ใช้ตอนที่ไม่มีเซ็นเซอร์จริงติดตัว
+      มี <b>Backend Flask + PostgreSQL</b> อยู่บนคลาวด์ (Render.com) — รับค่าจริงจาก ESP32 เก็บประวัติลงฐานข้อมูล และเสิร์ฟ dashboard ให้ดูได้จากทุกที่
     </div>
   </section>
 
@@ -590,7 +592,7 @@
     <div class="sec-head reveal">
       <span class="sec-num">03 — สถาปัตยกรรม</span>
       <h2>โครงสร้างโปรเจกต์</h2>
-      <p>สามส่วนหลักแยกจากกันชัดเจน: firmware บน ESP32, dashboard ที่เปิดได้ทั้งจากเครื่องและฝังอยู่ในตัว ESP32, และ backend mock สำหรับคลาวด์</p>
+      <p>สามส่วนหลักแยกจากกันชัดเจน: firmware บน ESP32, dashboard ที่เปิดได้ทั้งจากเครื่องและฝังอยู่ในตัว ESP32, และ backend จริงบนคลาวด์ (Flask + PostgreSQL)</p>
     </div>
     <div class="grid2">
       <div class="reveal">
@@ -605,7 +607,7 @@
   style.css      <span class="cmt">← dark green glassmorphism</span>
 
 <span class="dir">backend/</span>
-  app.py         <span class="cmt">← Flask mock API (Render.com)</span>
+  app.py         <span class="cmt">← Flask API จริง + PostgreSQL (Render.com)</span>
   requirements.txt
 
 render.yaml      <span class="cmt">← config deploy บน Render</span>
@@ -619,6 +621,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
             <ul class="check" style="margin-top:10px;">
               <li><b>dashboard.h</b> ฝังหน้าเว็บทั้ง HTML/CSS/JS เป็น C++ string literal → ESP32 เสิร์ฟเองได้ ไม่ต้องพึ่งอินเทอร์เน็ต</li>
               <li><b>dashboard/</b> เป็นเวอร์ชัน standalone เดียวกัน เปิดจากเครื่องหรือ deploy กับ backend ได้</li>
+              <li><b>ESP32 → คลาวด์:</b> ส่งค่าจริงขึ้น Render ทุก 1 นาที เก็บลง PostgreSQL — ดูข้อมูลจากที่ไหนก็ได้</li>
               <li>สองเวอร์ชันนี้<b>ต้องซิงค์กันด้วยมือ</b> (ไม่มี build script)</li>
             </ul>
           </div>
@@ -630,7 +633,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
             <ul class="check" style="margin-top:10px;">
               <li><b>ESP32:</b> ModbusMaster (Arduino library)</li>
               <li><b>Frontend:</b> Vanilla HTML/CSS/JS — ไม่มี framework, ไม่มี build step</li>
-              <li><b>Backend:</b> Flask 3.0.3 + flask-cors + gunicorn</li>
+              <li><b>Backend:</b> Flask 3.0.3 + flask-cors + gunicorn + PostgreSQL (psycopg)</li>
               <li><b>Fonts:</b> Prompt (ไทย) + JetBrains Mono (ตัวเลข)</li>
             </ul>
           </div>
@@ -644,7 +647,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
     <div class="sec-head reveal">
       <span class="sec-num">04 — Firmware ESP32</span>
       <h2>ESP32: ตัวกลางแปลงเซ็นเซอร์เป็นเว็บ API</h2>
-      <p>โค้ด Arduino C++ ใน <code class="inline">agriscan.ino</code> ทำหน้าที่: อ่านค่า Modbus → เก็บค่าในหน่วยความจำ → เสิร์ฟ JSON ให้ dashboard</p>
+      <p>โค้ด Arduino C++ ใน <code class="inline">agriscan.ino</code> ทำหน้าที่: อ่านค่า Modbus → เก็บค่าในหน่วยความจำ → เสิร์ฟ JSON ให้ dashboard ท้องถิ่น และส่งค่าจริงขึ้นคลาวด์</p>
     </div>
 
     <div class="grid2">
@@ -671,6 +674,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
             <ul class="check">
               <li><code class="inline">GET /</code> → เสิร์ฟหน้า Dashboard (จาก dashboard.h)</li>
               <li><code class="inline">GET /data</code> → ค่าเซ็นเซอร์เป็น JSON พร้อม <b>CORS เปิดทั้งหมด</b></li>
+              <li><code class="inline">POST /api/readings</code> → ส่งค่าจริงขึ้นคลาวด์ทุก 1 นาที (<b>HTTPS + X-API-Key</b>)</li>
               <li><code class="inline">mDNS</code> → เข้าผ่าน <code class="inline">http://agriscan.local</code> ไม่ต้องจำ IP</li>
             </ul>
           </div>
@@ -686,6 +690,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
               <li>ตรวจ WiFi ถ้าหลุด → <b>reconnect อัตโนมัติ</b></li>
               <li>อ่านค่าเซ็นเซอร์ผ่าน Modbus (<code class="inline">readHoldingRegisters(0x0000, 7)</code>)</li>
               <li>อ่านสำเร็จ → อัปเดตค่า / ไม่สำเร็จ → <b>ใช้ค่าเดิม</b> (ระบบทนทานต่อการขาดการติดต่อชั่วคราว)</li>
+              <li>POST ค่าจริงขึ้นคลาวด์ทุก <b>1 นาที</b> — สำเร็จ (201) / ล้มเหลว → ลองใหม่รอบถัดไป</li>
             </ul>
           </div>
         </div>
@@ -705,8 +710,8 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
     </div>
 
     <div class="reveal">
-      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin:22px 0 8px;">ตัวอย่าง JSON ที่ ESP32 ส่งออก</div>
-<pre><span class="c">// GET /data</span>
+      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin:22px 0 8px;">ตัวอย่าง JSON ที่ ESP32 ส่งขึ้นคลาวด์ (POST /api/readings)</div>
+<pre><span class="c">// ESP32 → Render (ทุก 1 นาที) · dashboard GET /api/latest เห็นค่านี้</span>
 { <span class="k">"moisture"</span>: <span class="n">45.2</span>, <span class="k">"temperature"</span>: <span class="n">28.5</span>, <span class="k">"ec"</span>: <span class="n">320</span>,
   <span class="k">"ph"</span>: <span class="n">6.8</span>, <span class="k">"n"</span>: <span class="n">45</span>, <span class="k">"p"</span>: <span class="n">32</span>, <span class="k">"k"</span>: <span class="n">89</span>,
   <span class="k">"valid"</span>: <span class="n">true</span> }</pre>
@@ -730,7 +735,7 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
             <li><b>Header:</b> โลโก้, สถานะออนไลน์/ออฟไลน์ (ไฟกระพริบ), เวลาอัปเดตล่าสุด, ป้าย IP ที่เชื่อมต่ออยู่ (คลิกเปลี่ยนได้)</li>
             <li><b>การ์ดเซ็นเซอร์ 5 ใบ:</b> ความชื้น (มี progress bar สีเปลี่ยนตามสถานะ), อุณหภูมิ, EC, pH, NPK (กราฟแท่ง 3 สี)</li>
             <li><b>คำแนะนำอัตโนมัติ:</b> การ์ดวิเคราะห์ค่าแต่ละตัวแบบ real-time</li>
-            <li><b>Banner:</b> แจ้ง "กำลังเชื่อมต่อ" และ "แสดงข้อมูลจำลอง"</li>
+            <li><b>Banner:</b> แจ้ง "กำลังเชื่อมต่อ" และสถานะ offline — ไม่มีข้อมูลจำลอง</li>
             <li><b>ลูกเล่น:</b> ตัวเลขกระพริบเมื่อค่ามีการเปลี่ยนแปลง, skeleton loading, ปุ่มรีเฟรช</li>
           </ul>
         </div>
@@ -758,14 +763,15 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
       <div class="chain">
         <div class="chain-step"><span class="no">1</span><span class="src">IP ที่ผู้ใช้ตั้งเอง (localStorage)</span><span class="why">จำจาก session ก่อนหน้า</span></div>
         <div class="chain-step"><span class="no">2</span><span class="src">URL ที่เชื่อมต่อสำเร็จล่าสุด</span><span class="why">เร็วสุดสำหรับการใช้งานซ้ำ</span></div>
-        <div class="chain-step"><span class="no">3</span><span class="src">Page Origin (หน้าเว็บที่เปิดอยู่)</span><span class="why">กรณีเปิดผ่าน ESP32 โดยตรง</span></div>
-        <div class="chain-step"><span class="no">4</span><span class="src">http://agriscan.local/data</span><span class="why">mDNS ของ ESP32</span></div>
-        <div class="chain-step"><span class="no">5</span><span class="src">http://192.168.1.1/data</span><span class="why">gateway ตอนใช้ hotspot</span></div>
-        <div class="chain-step"><span class="no">6</span><span class="src">http://localhost:5000/data</span><span class="why">mock backend (Flask)</span></div>
+        <div class="chain-step"><span class="no">3</span><span class="src">Page Origin (หน้าเว็บที่เปิดอยู่)</span><span class="why">กรณีเปิดผ่าน ESP32 หรือคลาวด์โดยตรง</span></div>
+        <div class="chain-step"><span class="no">4</span><span class="src">https://agriscan-backend-l4vu.onrender.com/data</span><span class="why">คลาวด์ Render — ค่าจริงจาก ESP32</span></div>
+        <div class="chain-step"><span class="no">5</span><span class="src">http://agriscan.local/data</span><span class="why">mDNS ของ ESP32 (เครือข่ายท้องถิ่น)</span></div>
+        <div class="chain-step"><span class="no">6</span><span class="src">http://192.168.1.1/data</span><span class="why">gateway ตอนใช้ hotspot</span></div>
+        <div class="chain-step"><span class="no">7</span><span class="src">http://localhost:5000/data</span><span class="why">backend รันในเครื่อง (dev)</span></div>
       </div>
       <div class="callout info reveal" style="margin-top:14px;">
         <span class="t">การกันพลาด</span>
-        แต่ละ URL มี timeout 3 วินาที (<code class="inline">AbortController</code>) — ถ้าลองครบแล้วเชื่อมไม่ได้ จะสลับเป็น <b>mock data พร้อมแบนเนอร์สีน้ำเงิน</b> แจ้งชัดเจนว่า "แสดงข้อมูลจำลอง — ESP32 ยังไม่ได้เชื่อมต่อ" และพยายามใหม่ทุก 5 วินาที / ทันทีที่กลับมาที่แท็บ
+        แต่ละ URL มี timeout 3 วินาที (<code class="inline">AbortController</code>) — <b>ไม่มี mock data</b> ถ้ายังไม่มีข้อมูล ระบบจะแสดงสถานะ offline ตามจริงและลองใหม่ทุก 5 วินาที / ทันทีที่กลับมาที่แท็บ จนกว่า ESP32 จะส่งค่ามา
       </div>
     </div>
   </section>
@@ -773,32 +779,35 @@ render.yaml      <span class="cmt">← config deploy บน Render</span>
   <!-- ═══════════ 06 Backend ═══════════ -->
   <section id="backend">
     <div class="sec-head reveal">
-      <span class="sec-num">06 — Backend</span>
-      <h2>Flask Mock API สำหรับสาธิตบนคลาวด์</h2>
-      <p>เมื่อสาธิตบน Render.com ไม่มีเซ็นเซอร์จริงติดตัว — Backend ตัวเล็ก ๆ นี้สร้างข้อมูลจำลองให้ dashboard แสดงผลได้เหมือนของจริง</p>
+      <span class="sec-num">06 — Backend & คลาวด์</span>
+      <h2>Flask API + PostgreSQL — ข้อมูลจริงจาก ESP32</h2>
+      <p>ESP32 ส่งค่าจริงขึ้นคลาวด์ (Render.com) เก็บลง PostgreSQL ทุก 1 นาที — dashboard บนเว็บดึงค่าจากฐานข้อมูล ไม่มีข้อมูลจำลอง</p>
     </div>
     <div class="grid3">
       <div class="card reveal">
-        <div class="c-big">GET /</div>
-        <div class="c-desc" style="margin-top:6px;">เสิร์ฟหน้า dashboard (โฟลเดอร์ <code class="inline">dashboard/</code>)</div>
+        <div class="c-big">POST /api/readings</div>
+        <div class="c-desc" style="margin-top:6px;">รับค่าจาก ESP32 (ต้องมี header <code class="inline">X-API-Key</code>) → บันทึกลง PostgreSQL</div>
       </div>
       <div class="card reveal">
-        <div class="c-big">GET /data</div>
-        <div class="c-desc" style="margin-top:6px;">ข้อมูลจำลองแบบสุ่ม ใกล้เคียงค่าจริง (ความชื้น 40–50%, อุณหภูมิ 27–31°C, EC 300–400...)</div>
+        <div class="c-big">GET /api/latest</div>
+        <div class="c-desc" style="margin-top:6px;">ค่าล่าสุดจากฐานข้อมูล (dashboard poll ทุก 5 วินาที) — <code class="inline">/data</code> เป็น alias เดียวกัน</div>
       </div>
       <div class="card reveal">
         <div class="c-big">GET /health</div>
-        <div class="c-desc" style="margin-top:6px;">ตรวจสถานะ service — คืน <code class="inline">{"status":"healthy"}</code></div>
+        <div class="c-desc" style="margin-top:6px;">ตรวจสถานะ service + ฐานข้อมูล — คืน <code class="inline">{"status":"healthy","db":"connected"}</code></div>
       </div>
     </div>
     <div class="reveal" style="margin-top:18px;">
-      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">วิธีรัน / Deploy</div>
-<pre><span class="c"># รันในเครื่อง (dev)</span>
-pip install -r backend/requirements.txt
-cd backend && python app.py          <span class="c"># http://localhost:5000</span>
+      <div class="c-label" style="font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Deploy จริงบน Render.com — ดูสดได้ที่ https://agriscan-backend-l4vu.onrender.com</div>
+<pre><span class="c"># Deploy: Render อ่าน render.yaml → สร้าง Web Service + PostgreSQL ให้อัตโนมัติ</span>
+<span class="c"># render.yaml ตั้งค่า: DATABASE_URL (จาก database service) + API_KEY (สุ่มอัตโนมัติ)</span>
 
-<span class="c"># Deploy บน Render.com — ผ่าน render.yaml อัตโนมัติ</span>
-<span class="c"># Python 3.10 · gunicorn app:app · CORS เปิดทั้งหมด</span></pre>
+<span class="c"># ทดสอบส่งค่าขึ้นคลาวด์ (เหมือน ESP32 ทำทุก 1 นาที)</span>
+curl -X POST https://agriscan-backend-l4vu.onrender.com/api/readings \
+     -H <span class="s">"Content-Type: application/json"</span> \
+     -H <span class="s">"X-API-Key: &lt;API_KEY&gt;"</span> \
+     -d <span class="s">'{"moisture":45.2,"temperature":28.5,"ec":320,"ph":6.8,"n":45,"p":32,"k":89}'</span>
+<span class="c"># → {"success": true} (201) · key ผิด → 401</span></pre>
     </div>
   </section>
 
@@ -813,22 +822,22 @@ cd backend && python app.py          <span class="c"># http://localhost:5000</sp
       <div class="pc pro reveal">
         <h3>จุดเด่น</h3>
         <ul>
-          <li><b>Self-contained:</b> ESP32 เสิร์ฟ dashboard เองได้ ไม่ต้องพึ่ง server หรืออินเทอร์เน็ต</li>
-          <li><b>ติดตั้งง่าย:</b> ไม่มี build step, ไม่มี framework, ไม่มี database — แค่เปิดไฟล์ HTML</li>
-          <li><b>กันพลาดสูง:</b> fallback chain 6 ระดับ + mock data → หน้าจอไม่เคยว่าง</li>
-          <li><b>ทนทาน:</b> อ่านเซ็นเซอร์ไม่สำเร็จใช้ค่าเดิม, WiFi หลุด reconnect อัตโนมัติ</li>
+          <li><b>ดูได้จากทุกที่:</b> dashboard บนคลาวด์ (Render) เปิดจากมือถือ/คอมพิวเตอร์ที่ไหนก็ได้ ข้อมูลจริงจากเซ็นเซอร์</li>
+          <li><b>Self-contained:</b> ESP32 ยังเสิร์ฟ dashboard ให้เครือข่ายท้องถิ่นได้เอง (agriscan.local) แม้ไม่มีอินเทอร์เน็ต</li>
+          <li><b>ติดตั้งง่าย:</b> ไม่มี build step, ไม่มี framework — deploy ผ่าน render.yaml อัตโนมัติ (Web + DB)</li>
+          <li><b>ข้อมูลจริงเท่านั้น:</b> ไม่มี mock data — ค่าที่แสดงมาจากเซ็นเซอร์จริง เก็บประวัติใน PostgreSQL</li>
+          <li><b>ทนทาน:</b> อ่านเซ็นเซอร์ไม่สำเร็จใช้ค่าเดิม, WiFi หลุด reconnect อัตโนมัติ, fallback chain 7 ระดับ</li>
           <li><b>ใช้งานง่าย:</b> UI ภาษาไทย + คำแนะนำบอกสูตรปุ๋ยเป็นตัวเลขชัดเจน</li>
-          <li><b>เข้าถึงง่าย:</b> mDNS (agriscan.local) ไม่ต้องจำ IP</li>
         </ul>
       </div>
       <div class="pc con reveal">
         <h3>ข้อจำกัด (ต้องรู้ก่อนนำเสนอ)</h3>
         <ul>
           <li><b>แสดงผลอย่างเดียว:</b> ไม่มี relay/actuator — ระบบแนะนำแต่ไม่ได้รดน้ำให้อัตโนมัติ</li>
-          <li><b>ไม่มีประวัติข้อมูล:</b> แสดงค่าปัจจุบันเท่านั้น ไม่มี graph ย้อนหลัง / database</li>
+          <li><b>ยังไม่มีกราฟประวัติ:</b> ข้อมูลเก็บลง PostgreSQL ครบ แต่ UI ยังแสดงเฉพาะค่าล่าสุด</li>
           <li><b>WiFi hardcode:</b> SSID/รหัสอยู่ในโค้ด ต้องแก้และ re-flash เพื่อเปลี่ยนเครือข่าย</li>
           <li><b>ต้องซิงค์ 2 ชุดด้วยมือ:</b> <code class="inline">dashboard.h</code> (ฝังใน ESP32) กับโฟลเดอร์ <code class="inline">dashboard/</code></li>
-          <li><b>ความปลอดภัย:</b> CORS เปิด <code class="inline">*</code> และไม่มี authentication — ตั้งใจทำเพื่อเครือข่ายท้องถิ่น</li>
+          <li><b>ความปลอดภัยแบบเบา:</b> API key กันการส่งข้อมูลปลอม แต่ CORS ยังเปิดและ key ฝังใน firmware</li>
         </ul>
       </div>
     </div>
@@ -859,8 +868,8 @@ cd backend && python app.py          <span class="c"># http://localhost:5000</sp
       <div class="pres-step">
         <div class="big">3</div>
         <div>
-          <h4>สาธิตสด</h4>
-          <p>เปิด <b>http://agriscan.local</b> โชว์ค่าที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> ให้เห็น log การอ่านค่าแบบ raw</p>
+          <h4>สาธิตสด — ดูจากมือถือ</h4>
+          <p>เปิด <b>https://agriscan-backend-l4vu.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 1 นาที</p>
         </div>
       </div>
       <div class="pres-step">
@@ -874,7 +883,7 @@ cd backend && python app.py          <span class="c"># http://localhost:5000</sp
         <div class="big">5</div>
         <div>
           <h4>โชว์การกันพลาด</h4>
-          <p>ถอดสาย ESP32 → dashboard สลับเป็น <b>mock data</b> พร้อมแบนเนอร์แจ้งเตือน ไม่พัง ไม่หน้าว่าง</p>
+          <p>ปิด ESP32 → หน้าเว็บแสดง <b>สถานะ offline ตามจริง</b> (ไม่มี mock) แต่ข้อมูลล่าสุดยังอยู่บนคลาวด์ — พอ ESP32 กลับมาออนไลน์ ข้อมูลไหลต่ออัตโนมัติ</p>
         </div>
       </div>
       <div class="pres-step">
@@ -888,15 +897,15 @@ cd backend && python app.py          <span class="c"># http://localhost:5000</sp
 
     <div class="callout warn reveal" style="margin-top:20px;">
       <span class="t">คำถามที่ผู้ชมมักถาม</span>
-      <b>"ข้อมูลแม่นไหม?"</b> — ค่ามาจากเซ็นเซอร์จริงผ่าน Modbus; backend mock ใช้สำหรับสาธิตบนคลาวด์เท่านั้น &nbsp;·&nbsp;
+      <b>"ข้อมูลแม่นไหม?"</b> — ค่ามาจากเซ็นเซอร์จริงผ่าน RS485 Modbus เก็บลง PostgreSQL ไม่มีข้อมูลจำลอง &nbsp;·&nbsp;
       <b>"รองรับกี่แปลง?"</b> — ตอนนี้ออกแบบมาสำหรับเซ็นเซอร์ชุดเดียว ต่อยอดเพิ่ม node ได้โดยใช้ Modbus ID ต่างกัน &nbsp;·&nbsp;
-      <b>"ใช้อินเทอร์เน็ตไหม?"</b> — ไม่จำเป็น ESP32 เสิร์ฟเว็บเองในเครือข่ายท้องถิ่น
+      <b>"ต้องมีอินเทอร์เน็ตไหม?"</b> — โหมดคลาวด์ต้องมี (ESP32 ส่งผ่าน WiFi) แต่โหมด local (agriscan.local) ยังใช้ได้ในเครือข่ายเดียวกัน
     </div>
   </section>
 
   <!-- ═══════════ Footer ═══════════ -->
   <footer class="reveal">
-    <p>Agriscan · ระบบ IoT ตรวจวัดค่าดินแบบ Real-time · เอกสารประกอบการนำเสนอ</p>
+    <p>Agriscan v2 · ระบบ IoT ตรวจวัดค่าดินแบบ Real-time · ข้อมูลจริงบนคลาวด์ · เอกสารประกอบการนำเสนอ</p>
     <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
   </footer>
 
@@ -939,9 +948,9 @@ function tick() {
 
   if (step === 0) lines = '🌱 [Sensor]  อ่านค่า 7 อย่างจาก Holding Registers 0x0000–0x0006\n' + lines;
   else if (step === 1) lines = '🔌 [RS485 Modbus]  ส่งข้อมูล 9600 baud ผ่านสาย 2 เส้น → ESP32 ✓';
-  else if (step === 2) lines = '⚙️ [ESP32]  แปลง raw → หน่วยจริง และสร้าง JSON:\n' + lines;
-  else if (step === 3) lines = '📶 [WiFi]  กำลังส่ง: http://agriscan.local/data (GET /data)\n' + lines;
-  else lines = '🖥️ [Dashboard]  แสดงผล + วิเคราะห์: ' + statusLine(d);
+  else if (step === 2) lines = '⚙️ [ESP32]  POST /api/readings (HTTPS + X-API-Key) ทุก 1 นาที:\n' + lines;
+  else if (step === 3) lines = '☁️ [คลาวด์ Render]  บันทึกลง PostgreSQL → GET /api/latest\n' + lines;
+  else lines = '🖥️ [Dashboard]  แสดงผลบนเว็บ (ดูได้จากทุกที่) + วิเคราะห์: ' + statusLine(d);
 
   READOUT.innerHTML = lines.split('\n').map(l => '<span class="' + (l.startsWith('│') || l.startsWith('┌') || l.startsWith('└') ? 'dim' : '') + '">' + l + '</span>').join('\n');
 
