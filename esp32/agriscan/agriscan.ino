@@ -10,6 +10,7 @@
 #include <HTTPClient.h>     // ← ส่งข้อมูลขึ้นคลาวด์
 #include <WiFiClientSecure.h>
 #include "dashboard.h"      // ← หน้าเว็บ HTML
+#include "secrets.h"        // ← API key (ไฟล์นี้ไม่ขึ้น Git)
 
 // ── WiFi ──────────────────────────────────────────────────
 const char* WIFI_SSID = "YOUR_WIFI_SSID";
@@ -18,10 +19,9 @@ const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
 // ── Cloud Upload ───────────────────────────────────────────
 // URL ของ backend บน Render
 const char* CLOUD_URL = "https://agriscan-backend-l4vu.onrender.com/api/readings";
-// API key — ดูจาก Render Dashboard → Environment (API_KEY)
-const char* API_KEY   = "a/DgeJIw8fCwV2YdyrUQLKtEMb1IrM7dYa85KQLR0kQ=";
-// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 60,000 = ทุก 1 นาที
-#define POST_INTERVAL_MS  60000
+// API key อยู่ใน secrets.h (ดูจาก Render Dashboard → Environment → API_KEY)
+// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 10,000 = ทุก 10 วินาที
+#define POST_INTERVAL_MS  10000
 
 // ── RS485 ─────────────────────────────────────────────────
 #define RXD2        16
@@ -270,7 +270,7 @@ void loop() {
     Serial.println();
   }
 
-  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (1 นาที)
+  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (10 วินาที)
   static unsigned long lastUpload = 0;
   if (millis() - lastUpload >= POST_INTERVAL_MS) {
     lastUpload = millis();

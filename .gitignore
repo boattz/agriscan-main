@@ -12,6 +12,7 @@ build/
 *.bin
 *.map
 *.partitions.bin
+esp32/agriscan/secrets.h
 
 # IDE
 .vscode/

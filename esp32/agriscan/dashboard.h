@@ -935,9 +935,9 @@ function updateUI(d) {
   // Recommendations
   buildRecommendations(d);
 
-  // Timestamp
-  const now = new Date();
-  $('last-update').textContent = now.toLocaleTimeString('th-TH');
+  // Timestamp — แสดงเวลาที่เซ็นเซอร์ส่งค่า (จากคลาวด์) ถ้า API ให้มา
+  const ts = d.timestamp ? new Date(d.timestamp) : new Date();
+  $('last-update').textContent = ts.toLocaleTimeString('th-TH');
 }
 
 // ─── Build recommendations ────────────────────────────────

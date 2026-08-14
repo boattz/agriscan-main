@@ -36,7 +36,7 @@ backend/
 **Data flow (ข้อมูลจริง ไม่มี mock):**
 
 ```
-เซ็นเซอร์ 7-in-1 → RS485 Modbus → ESP32 → POST /api/readings (HTTPS, ทุก 1 นาที)
+เซ็นเซอร์ 7-in-1 → RS485 Modbus → ESP32 → POST /api/readings (HTTPS, ทุก 10 วินาที)
                                           ↓
                               PostgreSQL (Render)
                                           ↓
@@ -59,7 +59,7 @@ const char* CLOUD_URL = "https://agriscan-backend-l4vu.onrender.com/api/readings
 const char* API_KEY   = "<ค่า API_KEY จาก Render — ดูที่ Environment>";
 ```
 
-- ESP32 จะ POST ค่าจริงขึ้นคลาวด์ทุก 1 นาที (`POST_INTERVAL_MS`)
+- ESP32 จะ POST ค่าจริงขึ้นคลาวด์ทุก 10 วินาที (`POST_INTERVAL_MS`)
 - ยังเสิร์ฟ dashboard ให้เครือข่ายท้องถิ่นผ่าน `http://agriscan.local` ตามเดิม
 
 ## วิธีใช้งาน
@@ -110,5 +110,5 @@ cd backend && python app.py          # http://localhost:5000
 ## หมายเหตุ
 
 - **ไม่มี mock data แล้ว** — ถ้ายังไม่มีข้อมูล หน้าเว็บจะแสดงสถานะ offline จนกว่า ESP32 จะส่งค่ามา
-- บน Render free tier พื้นที่ Postgres มีจำกัด (ข้อมูลทุก 1 นาที ≈ 1,400 แถว/วัน) เหมาะสำหรับการสาธิต
+- บน Render free tier พื้นที่ Postgres มีจำกัด (ข้อมูลทุก 10 วินาที ≈ 8,640 แถว/วัน) เหมาะสำหรับการสาธิต
 - HTTPS ของ ESP32 ใช้ `setInsecure()` — เพียงพอสำหรับการพัฒนา ถ้าต้องการความปลอดภัยสูงขึ้นควรใช้ certificate pinning
