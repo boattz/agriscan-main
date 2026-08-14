@@ -13,15 +13,15 @@
 #include "secrets.h"        // ← API key (ไฟล์นี้ไม่ขึ้น Git)
 
 // ── WiFi ──────────────────────────────────────────────────
-const char* WIFI_SSID = "YOUR_WIFI_SSID";
-const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID = "TWK.SM";
+const char* WIFI_PASS = "05022511";
 
 // ── Cloud Upload ───────────────────────────────────────────
 // URL ของ backend บน Render
 const char* CLOUD_URL = "https://agriscan-backend-l4vu.onrender.com/api/readings";
 // API key อยู่ใน secrets.h (ดูจาก Render Dashboard → Environment → API_KEY)
 // ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 10,000 = ทุก 10 วินาที
-#define POST_INTERVAL_MS  10000
+#define POST_INTERVAL_MS  5000
 
 // ── RS485 ─────────────────────────────────────────────────
 #define RXD2        16
