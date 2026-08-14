@@ -10,11 +10,11 @@
 #include <HTTPClient.h>     // ← ส่งข้อมูลขึ้นคลาวด์
 #include <WiFiClientSecure.h>
 #include "dashboard.h"      // ← หน้าเว็บ HTML
-#include "secrets.h"        // ← API key (ไฟล์นี้ไม่ขึ้น Git)
+#include "secrets.h"        // ← WiFi + API key (ไฟล์นี้ไม่ขึ้น Git)
 
 // ── WiFi ──────────────────────────────────────────────────
-const char* WIFI_SSID = "TWK.SM";
-const char* WIFI_PASS = "05022511";
+// SSID/รหัส WiFi อยู่ใน secrets.h (ไฟล์นี้ไม่ขึ้น Git — กันข้อมูลหลุด)
+// ถ้าต้องการแก้ WiFi ให้แก้ที่ secrets.h แล้ว re-flash
 
 // ── Cloud Upload ───────────────────────────────────────────
 // URL ของ backend บน Render
