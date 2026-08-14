@@ -216,7 +216,7 @@
       </div>
       <div class="card reveal">
         <div class="c-label">หนึ่งรอบการทำงาน</div>
-        <div class="c-title">🔄 วนเป็นวงกลมทุกนาที</div>
+        <div class="c-title">🔄 วนเป็นวงกลมทุก 3 วินาที</div>
         <div class="c-desc">ESP32 อ่านค่าเซ็นเซอร์ทุก 3 วินาที → ส่งขึ้นคลาวด์ทุก 3 วินาที → หน้าเว็บถามคลาวด์ทุก 3 วินาทีว่ามีค่าใหม่ไหม → โชว์บนจอ + บอกคำแนะนำ</div>
       </div>
     </div>
@@ -280,7 +280,7 @@
           <tr>
             <td><b>JavaScript</b></td>
             <td class="mono">dashboard/script.js</td>
-            <td>สมองฝั่งเว็บ — ดึงข้อมูลทุก 5 วิ, ไล่หาแหล่งข้อมูล, คำนวณคำแนะนำ, อัปเดตหน้าจอ</td>
+            <td>สมองฝั่งเว็บ — ดึงข้อมูลทุก 3 วิ, ไล่หาแหล่งข้อมูล, คำนวณคำแนะนำ, อัปเดตหน้าจอ</td>
             <td><span class="pill amber">สมองฝั่ง client</span></td>
           </tr>
           <tr>
@@ -400,13 +400,19 @@
 <span class="k">#include</span> <span class="s">&lt;WebServer.h&gt;</span>        <span class="c">// ทำเว็บเซิร์ฟเวอร์</span>
 <span class="k">#include</span> <span class="s">&lt;HTTPClient.h&gt;</span>       <span class="c">// ส่ง HTTP ขึ้นคลาวด์</span>
 <span class="k">#include</span> <span class="s">&lt;WiFiClientSecure.h&gt;</span> <span class="c">// HTTPS (เข้ารหัส)</span>
-<span class="k">#include</span> <span class="s">&lt;ESPmDNS.h&gt;</span>          <span class="c">// ชื่อ agriscan.local</span></pre>
+<span class="k">#include</span> <span class="s">&lt;ESPmDNS.h&gt;</span>          <span class="c">// ชื่อ agriscan.local</span>
+<span class="k">#include</span> <span class="s">"dashboard.h"</span>       <span class="c">// หน้าเว็บที่ฝังเป็น C++ string</span>
+<span class="k">#include</span> <span class="s">"secrets.h"</span>         <span class="c">// WiFi + API key (ไม่ขึ้น Git)</span></pre>
     <p class="reveal" style="font-size:0.8rem; color:var(--text-muted);">เหมือนเปิดตู้ยืมเครื่องมือ: <code class="inline">&lt;ModbusMaster.h&gt;</code> = คู่มือคุยกับเซนเซอร์, <code class="inline">&lt;WebServer.h&gt;</code> = ชุดทำเว็บ เป็นต้น</p>
 
-    <div class="sub-label reveal">② ตั้งค่าคงที่ — ป้ายชื่อแทนตัวเลข</div>
-<pre class="reveal"><span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;       <span class="c">// ชื่อ WiFi</span>
-<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://...onrender.com/api/readings"</span>; <span class="c">// ปลายทางคลาวด์</span>
+    <div class="sub-label reveal">② ตั้งค่าคงที่ — ป้ายชื่อแทนตัวเลข (แบ่งเป็น 2 ไฟล์)</div>
+<pre class="reveal"><span class="c">// ── secrets.h (ไฟล์นี้ไม่ขึ้น Git — กันข้อมูลหลุด) ──</span>
+<span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;       <span class="c">// ชื่อ WiFi</span>
+<span class="k">const char</span>* WIFI_PASS = <span class="s">"..."</span>;                  <span class="c">// รหัส WiFi</span>
 <span class="k">const char</span>* API_KEY   = <span class="s">"..."</span>;                  <span class="c">// รหัสยืนยันตัวตน</span>
+
+<span class="c">// ── agriscan.ino ──</span>
+<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://...onrender.com/api/readings"</span>; <span class="c">// ปลายทางคลาวด์</span>
 <span class="k">#define</span> RXD2   16      <span class="c">// ขา 16 = ขารับข้อมูล RS485</span>
 <span class="k">#define</span> BAUD_RATE 4800 <span class="c">// ความเร็วคุยกับเซนเซอร์</span></pre>
 
@@ -415,13 +421,13 @@
   <span class="c">// สั่งอ่าน Holding Registers 0x0000 จำนวน 7 ตัวในครั้งเดียว</span>
   <span class="hl">node.readHoldingRegisters(0x0000, 7);</span>
   <span class="c">// แปลง raw → หน่วยจริง (เซนเซอร์ส่งค่ามา ×10)</span>
-  d.moisture    = buf[0] / 10.0;          <span class="c">// ความชื้น %</span>
-  d.temperature = (int16_t)buf[1] / 10.0; <span class="c">// อุณหภูมิ °C (int16 รองรับค่าลบ)</span>
-  d.ec          = buf[2];                 <span class="c">// EC µS/cm</span>
-  d.ph          = buf[3] / 10.0;          <span class="c">// pH</span>
-  d.n           = buf[4];                 <span class="c">// N mg/kg</span>
-  d.p           = buf[5];                 <span class="c">// P mg/kg</span>
-  d.k           = buf[6];                 <span class="c">// K mg/kg</span>
+  d.moisture    = node.getResponseBuffer(0) / 10.0;          <span class="c">// ความชื้น %</span>
+  d.temperature = (int16_t)node.getResponseBuffer(1) / 10.0; <span class="c">// อุณหภูมิ °C (int16 รองรับค่าลบ)</span>
+  d.ec          = node.getResponseBuffer(2);                 <span class="c">// EC µS/cm</span>
+  d.ph          = node.getResponseBuffer(3) / 10.0;          <span class="c">// pH</span>
+  d.nitrogen    = node.getResponseBuffer(4);                 <span class="c">// N mg/kg</span>
+  d.phosphorus  = node.getResponseBuffer(5);                 <span class="c">// P mg/kg</span>
+  d.potassium   = node.getResponseBuffer(6);                 <span class="c">// K mg/kg</span>
 }</pre>
 
     <div class="sub-label reveal">④ setup() — เตรียมเครื่องครั้งเดียว</div>
@@ -637,7 +643,7 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render → <b>New → Blueprint</b> → เลือก repo</li>
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render สร้าง <b>Web Service + PostgreSQL</b> และสุ่ม <code class="inline">API_KEY</code> ให้</li>
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">ได้ URL เช่น <code class="inline">https://agriscan-xynf.onrender.com</code> ใช้ได้ทันที</li>
-          <li style="font-size:0.87rem; color:var(--text-secondary);">เอา <code class="inline">API_KEY</code> ไปใส่ใน <code class="inline">agriscan.ino</code> → flash ESP32</li>
+          <li style="font-size:0.87rem; color:var(--text-secondary);">เอา <code class="inline">API_KEY</code> ไปใส่ใน <code class="inline">secrets.h</code> (ไฟล์เดียวกับ <code class="inline">agriscan.ino</code>) → flash ESP32</li>
         </ol>
         <div class="callout info reveal" style="margin-top:14px;">
           <span class="t">ทำไมต้อง gunicorn?</span>

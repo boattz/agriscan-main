@@ -498,7 +498,7 @@
     <!-- Stats -->
     <div class="stats">
       <div class="stat"><div class="v">7</div><div class="k">ค่าที่วัดได้</div></div>
-      <div class="stat"><div class="v">5s</div><div class="k">รอบการอัปเดตหน้าจอ</div></div>
+      <div class="stat"><div class="v">3s</div><div class="k">รอบการอัปเดตหน้าจอ</div></div>
       <div class="stat"><div class="v">3s</div><div class="k">ส่งข้อมูลขึ้นคลาวด์</div></div>
       <div class="stat"><div class="v">0</div><div class="k">Mock Data</div></div>
     </div>
@@ -593,7 +593,7 @@
           </tr>
           <tr>
             <td><b>PostgreSQL</b></td>
-            <td>โปรแกรมเก็บข้อมูล (ฐานข้อมูล) — เหมือนตู้เอกสารยักษ์ เก็บประวัติค่าดินทุกนาทีไว้เรียงตามเวลา</td>
+            <td>โปรแกรมเก็บข้อมูล (ฐานข้อมูล) — เหมือนตู้เอกสารยักษ์ เก็บประวัติค่าดินทุก 3 วินาทีไว้เรียงตามเวลา</td>
           </tr>
           <tr>
             <td><b>Dashboard</b></td>
@@ -625,7 +625,7 @@
 
     <div class="callout ok reveal">
       <span class="t">จำง่าย ๆ</span>
-      <b>เซ็นเซอร์รู้สึก → ESP32 คิด → คลาวด์จำ → หน้าจอโชว์</b> — ทั้งโปรเจกต์คือการส่งข้อมูล 7 อย่างวนเป็นวงนี้ทุกนาที
+      <b>เซ็นเซอร์รู้สึก → ESP32 คิด → คลาวด์จำ → หน้าจอโชว์</b> — ทั้งโปรเจกต์คือการส่งข้อมูล 7 อย่างวนเป็นวงนี้ทุก 3 วินาที
     </div>
   </section>
 
@@ -760,6 +760,7 @@
 <span class="dir">esp32/agriscan/</span>
   agriscan.ino   <span class="cmt">← firmware: RS485 + WiFi + WebServer + Cloud POST</span>
   dashboard.h    <span class="cmt">← dashboard ฝังใน C++ raw string</span>
+  secrets.h      <span class="cmt">← WiFi + API key (ไม่ขึ้น Git — กันข้อมูลหลุด)</span>
 
 <span class="dir">dashboard/</span>
   index.html     <span class="cmt">← หน้าเว็บ standalone</span>
@@ -1111,11 +1112,14 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
           <li>คัดลอก <code class="inline">API_KEY</code> จาก Render → Environment</li>
         </ol>
 
-        <div class="sub-label">D · ตั้งค่า ESP32 (agriscan.ino)</div>
-<pre><span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;
+        <div class="sub-label">D · ตั้งค่า ESP32 — แก้ที่ secrets.h (ไม่ขึ้น Git)</div>
+<pre><span class="c">// ไฟล์ secrets.h — สร้างเองในโฟลเดอร์เดียวกับ agriscan.ino (กันข้อมูลหลุดจาก Git)</span>
+<span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;
 <span class="k">const char</span>* WIFI_PASS = <span class="s">"YOUR_WIFI_PASSWORD"</span>;
-<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-xynf.onrender.com/api/readings"</span>;
-<span class="k">const char</span>* API_KEY   = <span class="s">"&lt;ค่า API_KEY จาก Render&gt;"</span>;</pre>
+<span class="k">const char</span>* API_KEY   = <span class="s">"&lt;ค่า API_KEY จาก Render&gt;"</span>;
+
+<span class="c">// ไฟล์ agriscan.ino — ปลายทางคลาวด์ (แก้ที่นี่ได้)</span>
+<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-xynf.onrender.com/api/readings"</span>;</pre>
         <p style="font-size:0.8rem; color:var(--text-secondary); font-weight:300;">
           Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 3 วินาทีให้ dashboard บนคลาวด์
         </p>
@@ -1148,7 +1152,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <ul>
 
           <li><b>ยังไม่มีกราฟประวัติ:</b> ข้อมูลเก็บลง PostgreSQL ครบ แต่ UI ยังแสดงเฉพาะค่าล่าสุด</li>
-          <li><b>WiFi hardcode:</b> SSID/รหัสอยู่ในโค้ด ต้องแก้และ re-flash เพื่อเปลี่ยนเครือข่าย</li>
+          <li><b>WiFi hardcode:</b> SSID/รหัสอยู่ใน <code class="inline">secrets.h</code> (ไม่ขึ้น Git) ต้องแก้และ re-flash เพื่อเปลี่ยนเครือข่าย</li>
           <li><b>ต้องซิงค์ 2 ชุดด้วยมือ:</b> <code class="inline">dashboard.h</code> (ฝังใน ESP32) กับโฟลเดอร์ <code class="inline">dashboard/</code></li>
           <li><b>ความปลอดภัยแบบเบา:</b> API key กันการส่งข้อมูลปลอม แต่ CORS ยังเปิดและ key ฝังใน firmware</li>
           <li><b>ค่า N (mg/kg) ไม่มีเกณฑ์ทางการ:</b> กรมฯ วัด N เป็น % — ค่าจากเซ็นเซอร์เป็นเพียงค่าบ่งชี้</li>
