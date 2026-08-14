@@ -36,11 +36,11 @@ backend/
 **Data flow (ข้อมูลจริง ไม่มี mock):**
 
 ```
-เซ็นเซอร์ 7-in-1 → RS485 Modbus → ESP32 → POST /api/readings (HTTPS, ทุก 1 นาที)
+เซ็นเซอร์ 7-in-1 → RS485 Modbus → ESP32 → POST /api/readings (HTTPS, ทุก 3 วินาที)
                                           ↓
                               PostgreSQL (Render)
                                           ↓
-              Dashboard บนเว็บ ← GET /api/latest (poll ทุก 5 วินาที)
+              Dashboard บนเว็บ ← GET /api/latest (poll ทุก 3 วินาที)
 ```
 
 ## วิธี Deploy (Render.com) — ดูบนเว็บได้จริง
@@ -59,7 +59,7 @@ const char* CLOUD_URL = "https://agriscan-xynf.onrender.com/api/readings";
 const char* API_KEY   = "<ค่า API_KEY จาก Render — ดูที่ Environment>";
 ```
 
-- ESP32 จะ POST ค่าจริงขึ้นคลาวด์ทุก 1 นาที (`POST_INTERVAL_MS`)
+- ESP32 จะ POST ค่าจริงขึ้นคลาวด์ทุก 3 วินาที (`POST_INTERVAL_MS`)
 - Backend ลบข้อมูลเก่ากว่า 7 วันอัตโนมัติ (ตั้งได้ผ่าน env `RETAIN_DAYS`) — กัน database เต็ม
 - ยังเสิร์ฟ dashboard ให้เครือข่ายท้องถิ่นผ่าน `http://agriscan.local` ตามเดิม
 
@@ -111,5 +111,5 @@ cd backend && python app.py          # http://localhost:5000
 ## หมายเหตุ
 
 - **ไม่มี mock data แล้ว** — ถ้ายังไม่มีข้อมูล หน้าเว็บจะแสดงสถานะ offline จนกว่า ESP32 จะส่งค่ามา
-- บน Render free tier พื้นที่ Postgres มีจำกัด (ส่งทุก 1 นาที ≈ 1,440 แถว/วัน + ลบข้อมูลเก่าอัตโนมัติ) เหมาะสำหรับการสาธิต
+- บน Render free tier พื้นที่ Postgres มีจำกัด (ส่งทุก 3 วินาที ≈ 28,800 แถว/วัน + ลบข้อมูลเก่าอัตโนมัติ) เหมาะสำหรับการสาธิต
 - HTTPS ของ ESP32 ใช้ `setInsecure()` — เพียงพอสำหรับการพัฒนา ถ้าต้องการความปลอดภัยสูงขึ้นควรใช้ certificate pinning

@@ -2,9 +2,9 @@
 
 // ─── Config ───────────────────────────────────────────────
 const CONFIG = {
-  interval:     5000,
+  interval:     3000,
   maxRetry:     999,
-  retryDelay:   5000,
+  retryDelay:   3000,
   useMockOnFail: false,   // ไม่มี mock data — แสดงข้อมูลจริงเท่านั้น
   // URL ของ backend บน Render
   cloudApiUrl:  'https://agriscan-xynf.onrender.com'

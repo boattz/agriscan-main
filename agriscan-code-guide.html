@@ -171,6 +171,7 @@
   <div class="topnav-inner">
     <span class="brand"><span class="brand-dot"></span>Agriscan · Code Guide</span>
     <div class="topnav-links">
+      <a href="#intro">เริ่มจากตรงนี้</a>
       <a href="#lang">ภาษา</a>
       <a href="#stack">สแตก</a>
       <a href="#workflow">Workflow</a>
@@ -194,12 +195,63 @@
     </p>
   </header>
 
+  <!-- ═══════════ 00 อธิบายเป็นภาษาคน ═══════════ -->
+  <section id="intro">
+    <div class="sec-head reveal">
+      <span class="sec-num">00 — เริ่มจากตรงนี้</span>
+      <h2>ทั้งโปรเจกต์พูดเป็นภาษาคน คืออะไร?</h2>
+      <p>ถ้ายังไม่เคยเห็นโปรเจกต์นี้มาก่อน อ่านส่วนนี้ก่อน — จะเข้าใจภาพรวมทั้งหมดโดยไม่ต้องรู้อะไรเลย แล้วค่อยอ่านโค้ดทีละส่วนต่อ</p>
+    </div>
+
+    <div class="grid3">
+      <div class="card reveal">
+        <div class="c-label">เปรียบเหมือน</div>
+        <div class="c-title">🌱 "ไม้วัดดิน" ที่ต่อเน็ตได้</div>
+        <div class="c-desc">เอาแท่งเซ็นเซอร์ปักลงดิน → มันวัดได้ 7 อย่าง (ความชื้น อุณหภูมิ เค็ม/pH ธาตุอาหาร) → ส่งขึ้นอินเทอร์เน็ต → เปิดดูจากมือถือที่ไหนก็ได้ พร้อมคำแนะนำว่าควรรดน้ำหรือใส่ปุ๋ยอะไร</div>
+      </div>
+      <div class="card reveal">
+        <div class="c-label">ของ 4 ชิ้น</div>
+        <div class="c-title">🧩 ระบบแบ่งเป็น 4 ส่วน</div>
+        <div class="c-desc"><b>1)</b> เซ็นเซอร์ (รู้สึก) → <b>2)</b> ESP32 (คิด+ส่ง) → <b>3)</b> คลาวด์ (จำ) → <b>4)</b> หน้าเว็บ (โชว์) — แต่ละส่วนใช้ภาษาคอมพิวเตอร์คนละภาษา ทำคนละหน้าที่</div>
+      </div>
+      <div class="card reveal">
+        <div class="c-label">หนึ่งรอบการทำงาน</div>
+        <div class="c-title">🔄 วนเป็นวงกลมทุกนาที</div>
+        <div class="c-desc">ESP32 อ่านค่าเซ็นเซอร์ทุก 3 วินาที → ส่งขึ้นคลาวด์ทุก 3 วินาที → หน้าเว็บถามคลาวด์ทุก 3 วินาทีว่ามีค่าใหม่ไหม → โชว์บนจอ + บอกคำแนะนำ</div>
+      </div>
+    </div>
+
+    <div class="sub-label reveal">ศัพท์ที่เจอในเอกสารนี้ — แปลเป็นภาษาคน</div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>ศัพท์</th><th>แปลเป็นภาษาคน</th><th>ในโปรเจกต์นี้คือ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>เซ็นเซอร์</b> (Sensor)</td><td>อุปกรณ์ที่รู้สึกได้เหมือนประสาทสัมผัส</td><td>แท่งเหล็กปักดิน วัดได้ 7 ค่า</td></tr>
+          <tr><td><b>ESP32</b></td><td>คอมพิวเตอร์จิ๋วราคาถูก มี WiFi ในตัว</td><td>สมองของระบบ — อ่านค่า ส่งต่อ เสิร์ฟหน้าเว็บ</td></tr>
+          <tr><td><b>Firmware</b></td><td>โปรแกรมที่ฝังอยู่ในชิป</td><td><code class="inline">agriscan.ino</code> (ภาษา C++)</td></tr>
+          <tr><td><b>API</b></td><td>ช่องทางให้โปรแกรมคุยกัน</td><td>เส้นทาง URL เช่น <code class="inline">/api/readings</code></td></tr>
+          <tr><td><b>Backend</b></td><td>ฝั่งเซิร์ฟเวอร์ที่เก็บข้อมูล</td><td><code class="inline">app.py</code> (Python/Flask) บน Render</td></tr>
+          <tr><td><b>Frontend / Dashboard</b></td><td>ฝั่งหน้าจอที่คนเห็น</td><td>โฟลเดอร์ <code class="inline">dashboard/</code> (HTML/CSS/JS)</td></tr>
+          <tr><td><b>Database</b></td><td>ตู้เอกสารเก็บข้อมูล</td><td>PostgreSQL (บนคลาวด์) / SQLite (ในเครื่อง)</td></tr>
+          <tr><td><b>Deploy</b></td><td>เอาโปรแกรมขึ้นไปรันบนเซิร์ฟเวอร์จริง</td><td>Render อ่าน <code class="inline">render.yaml</code> แล้วสร้างให้อัตโนมัติ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout ok reveal">
+      <span class="t">อ่านต่อยังไง?</span>
+      ถ้าเพิ่งเริ่ม ไล่ตามเลข section ไปเรื่อย ๆ: 01 ภาษา → 02 สแตก → 03 Workflow → 04 ESP32 → 05 Dashboard → 06 Backend → 07 Deploy → 08 เส้นทางข้อมูล — แต่ละส่วนอธิบายด้วยภาษาง่าย ๆ + ตัวอย่างโค้ดจริง
+    </div>
+  </section>
+
   <!-- ═══════════ 01 ภาษาที่ใช้ ═══════════ -->
   <section id="lang">
     <div class="sec-head reveal">
       <span class="sec-num">01 — ภาษา</span>
       <h2>โปรเจกต์นี้ใช้ภาษาอะไรบ้าง?</h2>
-      <p>ทั้งหมด 5 ภาษา แต่ละภาษาทำหน้าที่ของตัวเอง คนละชั้น คนละงาน</p>
+      <p>ทั้งหมด 6 ภาษา แต่ละภาษาทำหน้าที่ของตัวเอง คนละชั้น คนละงาน</p>
     </div>
     <div class="table-wrap reveal">
       <table>
@@ -298,14 +350,14 @@
           <div class="wf-no">2</div>
           <div>
             <h4>🔌 ESP32 อ่านค่า (C++)</h4>
-            <p><code class="inline">loop()</code> ส่งคำสั่ง <code class="inline">readHoldingRegisters(0x0000, 7)</code> ทุก 5 วินาที → แปลง raw เป็นหน่วยจริง (เช่น ÷10)</p>
+            <p><code class="inline">loop()</code> ส่งคำสั่ง <code class="inline">readHoldingRegisters(0x0000, 7)</code> ทุก 3 วินาที → แปลง raw เป็นหน่วยจริง (เช่น ÷10)</p>
           </div>
         </div>
         <div class="wf-step">
           <div class="wf-no">3</div>
           <div>
             <h4>⚙️ ESP32 ทำ 2 หน้าที่พร้อมกัน</h4>
-            <p><b>เสิร์ฟ local:</b> ตอบ <code class="inline">GET /data</code> ให้คนในบ้าน/ไร่ · <b>ส่งคลาวด์:</b> <code class="inline">POST /api/readings</code> (HTTPS) ทุก 1 นาที</p>
+            <p><b>เสิร์ฟ local:</b> ตอบ <code class="inline">GET /data</code> ให้คนในบ้าน/ไร่ · <b>ส่งคลาวด์:</b> <code class="inline">POST /api/readings</code> (HTTPS) ทุก 3 วินาที</p>
           </div>
         </div>
         <div class="wf-step">
@@ -319,7 +371,7 @@
           <div class="wf-no">5</div>
           <div>
             <h4>🖥️ Dashboard ดึงและแสดง (JS)</h4>
-            <p>poll <code class="inline">GET /api/latest</code> ทุก 5 วินาที → อัปเดตการ์ด + คำนวณคำแนะนำอัตโนมัติ</p>
+            <p>poll <code class="inline">GET /api/latest</code> ทุก 3 วินาที → อัปเดตการ์ด + คำนวณคำแนะนำอัตโนมัติ</p>
           </div>
         </div>
       </div>
@@ -390,15 +442,15 @@
 
   checkWiFi();             <span class="c">// 2. WiFi หลุดไหม? ถ้าหลุด reconnect อัตโนมัติ</span>
 
-  <span class="c">// 3. อ่านเซนเซอร์ทุก 5 วินาที</span>
-  <span class="k">if</span> (millis() - lastRead &gt;= 5000) {
+  <span class="c">// 3. อ่านเซนเซอร์ทุก 3 วินาที</span>
+  <span class="k">if</span> (millis() - lastRead &gt;= 3000) {
     SoilData d = readSensor();
     <span class="k">if</span> (d.valid) lastData = d;   <span class="c">// สำเร็จ → เก็บค่า</span>
     <span class="c">// ไม่สำเร็จ → ใช้ค่าเดิม (ระบบทนทาน)</span>
   }
 
-  <span class="c">// 4. ส่งคลาวด์ทุก 1 นาที</span>
-  <span class="k">if</span> (millis() - lastUpload &gt;= 10000) {
+  <span class="c">// 4. ส่งคลาวด์ทุก 3 วินาที</span>
+  <span class="k">if</span> (millis() - lastUpload &gt;= 3000) {
     uploadReading();       <span class="c">// POST ไป Render</span>
   }
 }</pre>
@@ -446,7 +498,7 @@
 
     <div class="sub-label reveal">① CONFIG + state — ตั้งค่าและเก็บสถานะ</div>
 <pre class="reveal"><span class="k">const</span> CONFIG = {
-  interval:     5000,                    <span class="c">// poll ทุก 5 วินาที</span>
+  interval:     3000,                    <span class="c">// poll ทุก 3 วินาที</span>
   useMockOnFail: false,                  <span class="c">// ไม่มี mock data — แสดงข้อมูลจริงเท่านั้น</span>
   cloudApiUrl:  <span class="s">'https://agriscan-xynf.onrender.com'</span>
 };
@@ -489,7 +541,7 @@
 <pre class="reveal">setValue()   <span class="c">// ตั้งตัวเลข + เล่นแอนิเมชันกระพริบเมื่อค่าเปลี่ยน</span>
 animateBar() <span class="c">// ขยับกราฟแท่ง (moisture, NPK)</span>
 setChip()    <span class="c">// เปลี่ยนป้ายสถานะ (เขียว/เหลือง/แดง)</span>
-startPolling() <span class="c">// fetch ทันที + setInterval ทุก 5 วิ</span>
+startPolling() <span class="c">// fetch ทันที + setInterval ทุก 3 วิ</span>
 visibilitychange → <span class="c">// กลับมาที่แท็บ = ลองเชื่อมใหม่ทันที</span></pre>
 
     <div class="callout info reveal">
@@ -603,9 +655,9 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
       <p>จำลอง 2 สถานการณ์จริงเพื่อให้เห็นภาพว่าโค้ดแต่ละส่วนถูกเรียกเมื่อไหร่</p>
     </div>
 
-    <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 1 นาที)</div>
+    <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 3 วินาที)</div>
 <pre class="reveal"><span class="c">1. ESP32 (C++)</span>
-   loop() เห็นเวลาครบ 10 วินาที → uploadReading()
+   loop() เห็นเวลาครบ 3 วินาที → uploadReading()
    → POST https://agriscan-xynf.onrender.com/api/readings
      headers: X-API-Key, Content-Type: application/json
      body: {"moisture":45.2, "temperature":28.5, ...}
@@ -631,7 +683,7 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
 
     <div class="callout warn reveal">
       <span class="t">ถ้า ESP32 ยังไม่เคยส่งค่า</span>
-      <code class="inline">GET /api/latest</code> จะตอบ <b>404 "ยังไม่มีข้อมูล"</b> → dashboard แสดงสถานะ offline ตามจริง (ไม่มีการปลอมข้อมูล) และลองใหม่ทุก 5 วินาที
+      <code class="inline">GET /api/latest</code> จะตอบ <b>404 "ยังไม่มีข้อมูล"</b> → dashboard แสดงสถานะ offline ตามจริง (ไม่มีการปลอมข้อมูล) และลองใหม่ทุก 3 วินาที
     </div>
   </section>
 

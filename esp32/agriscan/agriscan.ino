@@ -20,8 +20,7 @@ const char* WIFI_PASS = "05022511";
 // URL ของ backend บน Render
 const char* CLOUD_URL = "https://agriscan-xynf.onrender.com/api/readings";
 // API key อยู่ใน secrets.h (ดูจาก Render Dashboard → Environment → API_KEY)
-// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 60,000 = ทุก 1 นาที
-// (ค่าดินเปลี่ยนช้า ส่งถี่เกินไปจะทำให้ database เต็มเร็ว — ลดจากทุก 1 วินาที)
+// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 3,000 = ทุก 3 วินาที
 #define POST_INTERVAL_MS  3000
 
 // ── RS485 ─────────────────────────────────────────────────
@@ -256,9 +255,9 @@ void loop() {
 
   checkWiFi();
 
-  // อ่านค่า sensor ทุก 5 วินาที
+  // อ่านค่า sensor ทุก 3 วินาที
   static unsigned long lastRead = 0;
-  if (millis() - lastRead >= 5000) {
+  if (millis() - lastRead >= 3000) {
     lastRead = millis();
 
     SoilData d = readSensor();
@@ -271,7 +270,7 @@ void loop() {
     Serial.println();
   }
 
-  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (1 นาที)
+  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (3 วินาที)
   static unsigned long lastUpload = 0;
   if (millis() - lastUpload >= POST_INTERVAL_MS) {
     lastUpload = millis();

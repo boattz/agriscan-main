@@ -424,6 +424,7 @@
     <span class="brand"><span class="brand-dot"></span>Agriscan</span>
     <div class="topnav-links">
       <a href="#overview">ภาพรวม</a>
+      <a href="#glossary">ศัพท์เทคนิค</a>
       <a href="#sensors">ค่าที่วัดได้</a>
       <a href="#hardware">ฮาร์ดแวร์</a>
       <a href="#firmware">Firmware</a>
@@ -445,7 +446,7 @@
     <h1>Agriscan<br /><span class="grad">ระบบ IoT ตรวจวัดค่าดินแบบ Real-time</span></h1>
     <p class="lead">
       ระบบอ่านค่าคุณภาพดิน 7 อย่างจากเซ็นเซอร์ RS485 Modbus ผ่าน ESP32
-      ส่งข้อมูลจริงขึ้นคลาวด์ (Render + PostgreSQL) ทุก 1 นาที แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที
+      ส่งข้อมูลจริงขึ้นคลาวด์ (Render + PostgreSQL) ทุก 3 วินาที แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 3 วินาที
       พร้อมระบบแนะนำการดูแลดินอัตโนมัติอ้างอิงเกณฑ์กรมพัฒนาที่ดิน — ดูได้จากทุกที่ ไม่มีข้อมูลจำลอง
     </p>
     <div class="tags">
@@ -488,7 +489,7 @@
         <div class="flow-node" data-step="4">
           <div class="f-icon">🖥️</div>
           <div class="f-name">Dashboard</div>
-          <div class="f-sub">ดึงค่าจริงทุก 5 วินาที · ดูได้ทุกที่</div>
+          <div class="f-sub">ดึงค่าจริงทุก 3 วินาที · ดูได้ทุกที่</div>
         </div>
       </div>
       <div class="flow-readout" id="readout"></div>
@@ -498,7 +499,7 @@
     <div class="stats">
       <div class="stat"><div class="v">7</div><div class="k">ค่าที่วัดได้</div></div>
       <div class="stat"><div class="v">5s</div><div class="k">รอบการอัปเดตหน้าจอ</div></div>
-      <div class="stat"><div class="v">60s</div><div class="k">ส่งข้อมูลขึ้นคลาวด์</div></div>
+      <div class="stat"><div class="v">3s</div><div class="k">ส่งข้อมูลขึ้นคลาวด์</div></div>
       <div class="stat"><div class="v">0</div><div class="k">Mock Data</div></div>
     </div>
   </header>
@@ -520,12 +521,12 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#14b8a6,#2dd4bf);">
         <div class="c-label">02 · ตัวกลาง</div>
         <div class="c-title">ESP32 ทำทุกอย่างในตัวเดียว</div>
-        <div class="c-desc">อ่านค่าเซ็นเซอร์, เสิร์ฟหน้า Dashboard ในเครือข่ายท้องถิ่น (agriscan.local) และ POST ค่าจริงขึ้นคลาวด์ทุก 1 นาที (HTTPS + API key)</div>
+        <div class="c-desc">อ่านค่าเซ็นเซอร์, เสิร์ฟหน้า Dashboard ในเครือข่ายท้องถิ่น (agriscan.local) และ POST ค่าจริงขึ้นคลาวด์ทุก 3 วินาที (HTTPS + API key)</div>
       </div>
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">03 · การแสดงผล</div>
         <div class="c-title">Dashboard เว็บ + คำแนะนำ</div>
-        <div class="c-desc">หน้าเว็บ Vanilla HTML/CSS/JS ดึงข้อมูลทุก 5 วินาที — เปิดบนคลาวด์ดูจากที่ไหนก็ได้ พร้อมวิเคราะห์และแนะนำการดูแลดินอัตโนมัติเป็นภาษาไทย</div>
+        <div class="c-desc">หน้าเว็บ Vanilla HTML/CSS/JS ดึงข้อมูลทุก 3 วินาที — เปิดบนคลาวด์ดูจากที่ไหนก็ได้ พร้อมวิเคราะห์และแนะนำการดูแลดินอัตโนมัติเป็นภาษาไทย</div>
       </div>
     </div>
 
@@ -539,15 +540,99 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">โหมด Cloud (ทุกที่)</div>
         <div class="c-title">ข้อมูลจริงบนคลาวด์ — ดูจากมือถือที่ไหนก็ได้</div>
-        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 1 นาที เปิด <code class="inline">https://agriscan-xynf.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
+        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 3 วินาที เปิด <code class="inline">https://agriscan-xynf.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════ 02 ค่าที่วัดได้ ═══════════ -->
+  <!-- ═══════════ 02 ศัพท์เทคนิค (สำหรับคนไม่รู้) ═══════════ -->
+  <section id="glossary">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 — ศัพท์เทคนิค</span>
+      <h2>ฟังแล้วไม่รู้เรื่อง? แปลเป็นภาษาคนตรงนี้</h2>
+      <p>ก่อนอ่านส่วนต่อไป ขอแปลศัพท์เทคนิคทั้งหมดที่เจอในโปรเจกต์นี้เป็นภาษาง่าย ๆ — อ่านจบส่วนนี้แล้วจะเข้าใจทุกหน้าต่อจากนี้</p>
+    </div>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>คำศัพท์</th><th>พูดเป็นภาษาคน</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>IoT</b> (Internet of Things)</td>
+            <td>ของใช้ทั่วไปที่ต่ออินเทอร์เน็ตได้ เช่น หลอดไฟเปิดปิดผ่านมือถือ นาฬิกาอัจฉริยะ — โปรเจกต์นี้คือ "ไม้วัดดิน" ที่ต่อเน็ตได้</td>
+          </tr>
+          <tr>
+            <td><b>เซ็นเซอร์</b> (Sensor)</td>
+            <td>อุปกรณ์ที่"รู้สึก"ได้เหมือนประสาทสัมผัส — ตัวนี้รู้ว่าดินชื้นแค่ไหน ร้อนแค่ไหน มีธาตุอาหารเท่าไหร่</td>
+          </tr>
+          <tr>
+            <td><b>ESP32</b></td>
+            <td>ชิปคอมพิวเตอร์จิ๋วราคาไม่กี่ร้อยบาท มี WiFi ในตัว — ทำหน้าที่เป็น "สมอง" ของระบบ คอยอ่านค่าจากเซ็นเซอร์แล้วส่งต่อ</td>
+          </tr>
+          <tr>
+            <td><b>RS485 / Modbus</b></td>
+            <td>ภาษาที่เซ็นเซอร์กับ ESP32 ใช้คุยกันผ่านสายไฟ 2 เส้น — เหมือนสายโทรศัพท์บ้านที่ส่งสัญญาณได้ไกลและทนสัญญาณรบกวน</td>
+          </tr>
+          <tr>
+            <td><b>Firmware</b> (เฟิร์มแวร์)</td>
+            <td>โปรแกรมที่ฝังอยู่ในชิป คอยสั่งงานฮาร์ดแวร์ — เหมือนระบบปฏิบัติการในเครื่องซักผ้า ไม่ได้เห็นหน้าจอแต่ทำงานตลอดเวลา</td>
+          </tr>
+          <tr>
+            <td><b>API</b></td>
+            <td>ช่องทางให้โปรแกรมต่าง ๆ คุยกัน — เหมือนพนักงานหน้าร้าน: บอก"ขอดูข้อมูลล่าสุด" พนักงานก็ไปหยิบมาให้ (โดยไม่ต้องเข้าไปในคลังเอง)</td>
+          </tr>
+          <tr>
+            <td><b>JSON</b></td>
+            <td>รูปแบบการเขียนข้อมูลที่ทั้งเครื่องและคนอ่านเข้าใจ — เหมือนฟอร์มกรอกข้อมูล: <code class="inline">{"ความชื้น": 45, "อุณหภูมิ": 28}</code></td>
+          </tr>
+          <tr>
+            <td><b>คลาวด์</b> (Cloud)</td>
+            <td>คอมพิวเตอร์ของคนอื่นที่เราเช่าใช้ผ่านอินเทอร์เน็ต — เหมือนฝากของไว้ที่โกดังกลาง เปิดดูจากที่ไหนก็ได้</td>
+          </tr>
+          <tr>
+            <td><b>PostgreSQL</b></td>
+            <td>โปรแกรมเก็บข้อมูล (ฐานข้อมูล) — เหมือนตู้เอกสารยักษ์ เก็บประวัติค่าดินทุกนาทีไว้เรียงตามเวลา</td>
+          </tr>
+          <tr>
+            <td><b>Dashboard</b></td>
+            <td>หน้าเว็บที่รวมทุกอย่างไว้ที่เดียว — เหมือนแผงหน้าปัดรถยนต์ เห็นความเร็ว น้ำมัน อุณหภูมิ ในจอเดียว</td>
+          </tr>
+          <tr>
+            <td><b>HTTPS</b></td>
+            <td>ช่องทางส่งข้อมูลแบบใส่ซองปิดผนึก — กันคนอื่นแอบอ่านข้อมูลระหว่างทาง (เห็นเป็น <code class="inline">https://</code> นำหน้า URL)</td>
+          </tr>
+          <tr>
+            <td><b>API Key</b></td>
+            <td>รหัสผ่านเฉพาะของระบบ — เหมือนกุญแจห้องส่งของ ใครไม่มีกุญแจส่งข้อมูลเข้ามาไม่ได้</td>
+          </tr>
+          <tr>
+            <td><b>Poll</b> (โพล)</td>
+            <td>การ"ถามเป็นระยะ" — หน้าเว็บถามเซิร์ฟเวอร์ทุก 3 วินาทีว่า"มีค่าล่าสุดไหม" เหมือนเด็กถามแม่ทุก 3 วิว่า"ข้าวสุกยัง"</td>
+          </tr>
+          <tr>
+            <td><b>Deploy</b> (ดีพลอย)</td>
+            <td>การเอาโปรแกรมขึ้นไปรันบนเซิร์ฟเวอร์จริงให้คนอื่นใช้ — เหมือนย้ายงานจากโต๊ะทดลองไปเปิดหน้าร้าน</td>
+          </tr>
+          <tr>
+            <td><b>mDNS</b></td>
+            <td>สมุดโทรศัพท์ภายในบ้าน — ให้เราเรียก ESP32 ด้วยชื่อ <code class="inline">agriscan.local</code> แทนการจำเลข IP ยาว ๆ</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout ok reveal">
+      <span class="t">จำง่าย ๆ</span>
+      <b>เซ็นเซอร์รู้สึก → ESP32 คิด → คลาวด์จำ → หน้าจอโชว์</b> — ทั้งโปรเจกต์คือการส่งข้อมูล 7 อย่างวนเป็นวงนี้ทุกนาที
+    </div>
+  </section>
+
+  <!-- ═══════════ 03 ค่าที่วัดได้ ═══════════ -->
   <section id="sensors">
     <div class="sec-head reveal">
-      <span class="sec-num">02 — เซ็นเซอร์</span>
+      <span class="sec-num">03 — เซ็นเซอร์</span>
       <h2>ค่าที่วัดได้และเกณฑ์อ้างอิง</h2>
       <p>ระบบอ่านค่า 7 อย่างจากเซ็นเซอร์เดียวกันผ่านโปรโตคอล Modbus RTU โดยอ่าน Holding Registers 0x0000–0x0006 ต่อเนื่อง 7 ตัวในคำสั่งเดียว เกณฑ์อ้างอิงจากกรมพัฒนาที่ดิน</p>
     </div>
@@ -665,7 +750,7 @@
   <!-- ═══════════ 03 สถาปัตยกรรม ═══════════ -->
   <section id="architecture">
     <div class="sec-head reveal">
-      <span class="sec-num">03 — สถาปัตยกรรม</span>
+      <span class="sec-num">04 — สถาปัตยกรรม</span>
       <h2>โครงสร้างโปรเจกต์</h2>
       <p>สามส่วนหลักแยกจากกันชัดเจน: firmware บน ESP32, dashboard ที่เปิดได้ทั้งจากเครื่องและฝังอยู่ในตัว ESP32, และ backend จริงบนคลาวด์ (Flask + PostgreSQL)</p>
     </div>
@@ -696,7 +781,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
             <ul class="check" style="margin-top:10px;">
               <li><b>dashboard.h</b> ฝังหน้าเว็บทั้ง HTML/CSS/JS เป็น C++ string literal → ESP32 เสิร์ฟเองได้ ไม่ต้องพึ่งอินเทอร์เน็ต</li>
               <li><b>dashboard/</b> เป็นเวอร์ชัน standalone เดียวกัน เปิดจากเครื่องหรือ deploy กับ backend ได้</li>
-              <li><b>ESP32 → คลาวด์:</b> ส่งค่าจริงขึ้น Render ทุก 1 นาที เก็บลง PostgreSQL — ดูข้อมูลจากที่ไหนก็ได้</li>
+              <li><b>ESP32 → คลาวด์:</b> ส่งค่าจริงขึ้น Render ทุก 3 วินาที เก็บลง PostgreSQL — ดูข้อมูลจากที่ไหนก็ได้</li>
               <li>สองเวอร์ชันนี้<b>ต้องซิงค์กันด้วยมือ</b> (ไม่มี build script)</li>
             </ul>
           </div>
@@ -721,7 +806,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
   <!-- ═══════════ 04 ฮาร์ดแวร์ ═══════════ -->
   <section id="hardware">
     <div class="sec-head reveal">
-      <span class="sec-num">04 — ฮาร์ดแวร์</span>
+      <span class="sec-num">05 — ฮาร์ดแวร์</span>
       <h2>อุปกรณ์และการต่อวงจร</h2>
       <p>ระบบใช้ชิ้นส่วนเพียง 4 อย่าง: ESP32, เซ็นเซอร์ดิน 7-in-1, วงจร MAX485 (ตัวแปลง RS485), และสายไฟ 2 เส้น</p>
     </div>
@@ -786,7 +871,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
   <!-- ═══════════ 05 Firmware ═══════════ -->
   <section id="firmware">
     <div class="sec-head reveal">
-      <span class="sec-num">05 — Firmware ESP32</span>
+      <span class="sec-num">06 — Firmware ESP32</span>
       <h2>ESP32: ตัวกลางแปลงเซ็นเซอร์เป็นเว็บ API</h2>
       <p>โค้ด Arduino C++ ใน <code class="inline">agriscan.ino</code> ทำ 4 หน้าที่หลัก: อ่านค่า Modbus → เก็บค่าในหน่วยความจำ → เสิร์ฟ dashboard ท้องถิ่น → ส่งค่าขึ้นคลาวด์</p>
     </div>
@@ -815,7 +900,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
             <ul class="check">
               <li><code class="inline">GET /</code> → เสิร์ฟหน้า Dashboard (จาก dashboard.h)</li>
               <li><code class="inline">GET /data</code> → ค่าเซ็นเซอร์เป็น JSON พร้อม <b>CORS เปิดทั้งหมด</b></li>
-              <li><code class="inline">POST /api/readings</code> → ส่งค่าจริงขึ้นคลาวด์ทุก 1 นาที (<b>HTTPS + X-API-Key</b>)</li>
+              <li><code class="inline">POST /api/readings</code> → ส่งค่าจริงขึ้นคลาวด์ทุก 3 วินาที (<b>HTTPS + X-API-Key</b>)</li>
               <li><code class="inline">mDNS</code> → เข้าผ่าน <code class="inline">http://agriscan.local</code> ไม่ต้องจำ IP</li>
             </ul>
           </div>
@@ -829,9 +914,9 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
             <ul class="check">
               <li>รับ HTTP request ผ่าน <code class="inline">server.handleClient()</code> ตลอดเวลา</li>
               <li>ตรวจ WiFi ถ้าหลุด → <b>reconnect อัตโนมัติ</b></li>
-              <li>อ่านค่าเซ็นเซอร์ผ่าน Modbus (<code class="inline">readHoldingRegisters(0x0000, 7)</code>) ทุก 5 วินาที</li>
+              <li>อ่านค่าเซ็นเซอร์ผ่าน Modbus (<code class="inline">readHoldingRegisters(0x0000, 7)</code>) ทุก 3 วินาที</li>
               <li>อ่านสำเร็จ → อัปเดตค่า / ไม่สำเร็จ → <b>ใช้ค่าเดิม</b> (ระบบทนทานต่อการขาดการติดต่อชั่วคราว)</li>
-              <li>POST ค่าจริงขึ้นคลาวด์ทุก <b>10 วินาที</b> — สำเร็จ (201) / ล้มเหลว → ลองใหม่รอบถัดไป</li>
+              <li>POST ค่าจริงขึ้นคลาวด์ทุก <b>3 วินาที</b> — สำเร็จ (201) / ล้มเหลว → ลองใหม่รอบถัดไป</li>
             </ul>
           </div>
         </div>
@@ -852,7 +937,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
 
     <div class="reveal">
       <div class="sub-label">ตัวอย่าง JSON ที่ ESP32 ส่งขึ้นคลาวด์ (POST /api/readings)</div>
-<pre><span class="c">// ESP32 → Render (ทุก 1 นาที) · dashboard GET /api/latest เห็นค่านี้</span>
+<pre><span class="c">// ESP32 → Render (ทุก 3 วินาที) · dashboard GET /api/latest เห็นค่านี้</span>
 { <span class="k">"moisture"</span>: <span class="n">45.2</span>, <span class="k">"temperature"</span>: <span class="n">28.5</span>, <span class="k">"ec"</span>: <span class="n">320</span>,
   <span class="k">"ph"</span>: <span class="n">6.8</span>, <span class="k">"n"</span>: <span class="n">45</span>, <span class="k">"p"</span>: <span class="n">32</span>, <span class="k">"k"</span>: <span class="n">89</span>,
   <span class="k">"valid"</span>: <span class="n">true</span> }</pre>
@@ -866,9 +951,9 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
   <!-- ═══════════ 06 Dashboard ═══════════ -->
   <section id="dashboard">
     <div class="sec-head reveal">
-      <span class="sec-num">06 — Dashboard</span>
+      <span class="sec-num">07 — Dashboard</span>
       <h2>หน้าแสดงผลและ "สมอง" ของระบบ</h2>
-      <p>แดชบอร์ด Vanilla JS ธีม dark green glassmorphism ภาษาไทย — ดึงข้อมูลทุก 5 วินาที พร้อมระบบหาที่อยู่ของ ESP32 อัตโนมัติ และแนะนำการดูแลดินอ้างอิงเกณฑ์กรมพัฒนาที่ดิน</p>
+      <p>แดชบอร์ด Vanilla JS ธีม dark green glassmorphism ภาษาไทย — ดึงข้อมูลทุก 3 วินาที พร้อมระบบหาที่อยู่ของ ESP32 อัตโนมัติ และแนะนำการดูแลดินอ้างอิงเกณฑ์กรมพัฒนาที่ดิน</p>
     </div>
 
     <div class="grid2">
@@ -915,7 +1000,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
       </div>
       <div class="callout info reveal" style="margin-top:14px;">
         <span class="t">การกันพลาด</span>
-        แต่ละ URL มี timeout 3 วินาที (<code class="inline">AbortController</code>) — <b>ไม่มี mock data</b> ถ้ายังไม่มีข้อมูล ระบบจะแสดงสถานะ offline ตามจริงและลองใหม่ทุก 5 วินาที / ทันทีที่กลับมาที่แท็บ จนกว่า ESP32 จะส่งค่ามา
+        แต่ละ URL มี timeout 3 วินาที (<code class="inline">AbortController</code>) — <b>ไม่มี mock data</b> ถ้ายังไม่มีข้อมูล ระบบจะแสดงสถานะ offline ตามจริงและลองใหม่ทุก 3 วินาที / ทันทีที่กลับมาที่แท็บ จนกว่า ESP32 จะส่งค่ามา
       </div>
     </div>
   </section>
@@ -923,9 +1008,9 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
   <!-- ═══════════ 07 Backend & คลาวด์ ═══════════ -->
   <section id="backend">
     <div class="sec-head reveal">
-      <span class="sec-num">07 — Backend & คลาวด์</span>
+      <span class="sec-num">08 — Backend & คลาวด์</span>
       <h2>Flask API + PostgreSQL — ข้อมูลจริงจาก ESP32</h2>
-      <p>ESP32 ส่งค่าจริงขึ้นคลาวด์ (Render.com) เก็บลง PostgreSQL ทุก 1 นาที — dashboard บนเว็บดึงค่าจากฐานข้อมูล ไม่มีข้อมูลจำลอง</p>
+      <p>ESP32 ส่งค่าจริงขึ้นคลาวด์ (Render.com) เก็บลง PostgreSQL ทุก 3 วินาที — dashboard บนเว็บดึงค่าจากฐานข้อมูล ไม่มีข้อมูลจำลอง</p>
     </div>
 
     <div class="grid3">
@@ -935,7 +1020,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
       </div>
       <div class="card reveal">
         <div class="c-big">GET /api/latest</div>
-        <div class="c-desc" style="margin-top:6px;">ค่าล่าสุดจากฐานข้อมูล (dashboard poll ทุก 5 วินาที) — <code class="inline">/data</code> เป็น alias เดียวกัน · ยังไม่มีข้อมูล → <b>404</b></div>
+        <div class="c-desc" style="margin-top:6px;">ค่าล่าสุดจากฐานข้อมูล (dashboard poll ทุก 3 วินาที) — <code class="inline">/data</code> เป็น alias เดียวกัน · ยังไม่มีข้อมูล → <b>404</b></div>
       </div>
       <div class="card reveal">
         <div class="c-big">GET /health</div>
@@ -993,7 +1078,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
   <!-- ═══════════ 08 วิธีใช้งาน ═══════════ -->
   <section id="usage">
     <div class="sec-head reveal">
-      <span class="sec-num">08 — วิธีใช้งาน</span>
+      <span class="sec-num">09 — วิธีใช้งาน</span>
       <h2>ติดตั้ง / รัน / Deploy</h2>
       <p>ทุกขั้นตอนตั้งแต่รันในเครื่อง ทดสอบ API จนถึง deploy บนคลาวด์</p>
     </div>
@@ -1032,7 +1117,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
 <span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-xynf.onrender.com/api/readings"</span>;
 <span class="k">const char</span>* API_KEY   = <span class="s">"&lt;ค่า API_KEY จาก Render&gt;"</span>;</pre>
         <p style="font-size:0.8rem; color:var(--text-secondary); font-weight:300;">
-          Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 1 นาทีให้ dashboard บนคลาวด์
+          Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 3 วินาทีให้ dashboard บนคลาวด์
         </p>
       </div>
     </div>
@@ -1041,7 +1126,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
   <!-- ═══════════ 09 จุดเด่น / ข้อจำกัด ═══════════ -->
   <section id="eval">
     <div class="sec-head reveal">
-      <span class="sec-num">09 — ประเมินโปรเจกต์</span>
+      <span class="sec-num">10 — ประเมินโปรเจกต์</span>
       <h2>จุดเด่นและข้อจำกัด</h2>
       <p>ส่วนนี้ช่วยตอบคำถามผู้ชมได้อย่างมั่นใจ — รู้ทั้งสิ่งที่ทำได้ดีและขอบเขตที่ยังไม่ได้ทำ</p>
     </div>
@@ -1075,7 +1160,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
   <!-- ═══════════ 10 แนวทางนำเสนอ ═══════════ -->
   <section id="present">
     <div class="sec-head reveal">
-      <span class="sec-num">10 — คู่มือนำเสนอ</span>
+      <span class="sec-num">11 — คู่มือนำเสนอ</span>
       <h2>แนวทางการสาธิต (5 นาที)</h2>
       <p>ลำดับการนำเสนอที่เล่าเรื่องได้ครบ: ปัญหา → วิธีแก้ → สาธิตจริง → จุดแข็ง → ต่อยอด</p>
     </div>
@@ -1098,7 +1183,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <div class="big">3</div>
         <div>
           <h4>สาธิตสด — ดูจากมือถือ</h4>
-          <p>เปิด <b>https://agriscan-xynf.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 1 นาที</p>
+          <p>เปิด <b>https://agriscan-xynf.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 3 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 3 วินาที</p>
         </div>
       </div>
       <div class="pres-step">
@@ -1136,7 +1221,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
   <!-- ═══════════ 11 Roadmap ═══════════ -->
   <section id="roadmap">
     <div class="sec-head reveal">
-      <span class="sec-num">11 — การต่อยอด</span>
+      <span class="sec-num">12 — การต่อยอด</span>
       <h2>แผนพัฒนาในอนาคต</h2>
       <p>เส้นทางต่อจากนี้ — เรียงจากง่ายไปยาก แต่ละขั้นต่อยอดจากระบบที่สร้างไว้แล้ว</p>
     </div>
@@ -1219,7 +1304,7 @@ function tick() {
 
   if (step === 0) lines = '🌱 [Sensor]  อ่านค่า 7 อย่างจาก Holding Registers 0x0000–0x0006\n' + lines;
   else if (step === 1) lines = '🔌 [RS485 Modbus]  ส่งข้อมูล 4800 baud ผ่านสาย 2 เส้น → ESP32 ✓';
-  else if (step === 2) lines = '⚙️ [ESP32]  POST /api/readings (HTTPS + X-API-Key) ทุก 1 นาที:\n' + lines;
+  else if (step === 2) lines = '⚙️ [ESP32]  POST /api/readings (HTTPS + X-API-Key) ทุก 3 วินาที:\n' + lines;
   else if (step === 3) lines = '☁️ [คลาวด์ Render]  บันทึกลง PostgreSQL → GET /api/latest\n' + lines;
   else lines = '🖥️ [Dashboard]  แสดงผลบนเว็บ (ดูได้จากทุกที่) + วิเคราะห์: ' + statusLine(d);
 
