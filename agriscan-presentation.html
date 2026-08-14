@@ -1146,7 +1146,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
       <div class="pc con reveal">
         <h3>ข้อจำกัด (ต้องรู้ก่อนนำเสนอ)</h3>
         <ul>
-          <li><b>แสดงผลอย่างเดียว:</b> ไม่มี relay/actuator — ระบบแนะนำแต่ไม่ได้รดน้ำให้อัตโนมัติ</li>
+
           <li><b>ยังไม่มีกราฟประวัติ:</b> ข้อมูลเก็บลง PostgreSQL ครบ แต่ UI ยังแสดงเฉพาะค่าล่าสุด</li>
           <li><b>WiFi hardcode:</b> SSID/รหัสอยู่ในโค้ด ต้องแก้และ re-flash เพื่อเปลี่ยนเครือข่าย</li>
           <li><b>ต้องซิงค์ 2 ชุดด้วยมือ:</b> <code class="inline">dashboard.h</code> (ฝังใน ESP32) กับโฟลเดอร์ <code class="inline">dashboard/</code></li>
@@ -1204,7 +1204,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <div class="big">6</div>
         <div>
           <h4>ปิดด้วยการต่อยอด</h4>
-          <p>"ต่อไปเพิ่ม <b>relay ควบคุมระบบน้ำอัตโนมัติ</b> เก็บประวัติลง <b>PostgreSQL</b> (เก็บอยู่แล้ว) และแจ้งเตือนผ่าน <b>Line</b> ได้"</p>
+          <p>"ต่อไปเพิ่ม <b>กราฟประวัติ</b> (ข้อมูลเก็บใน PostgreSQL อยู่แล้ว) และ<b>แจ้งเตือนผ่าน Line</b> ได้"</p>
         </div>
       </div>
     </div>
@@ -1242,17 +1242,12 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <p>เมื่อค่าเกินเกณฑ์ (เช่น ดินแห้ง, pH กรด) backend ส่ง Line Notify ไปหาคนดูแลทันที</p>
       </div>
       <div class="rm reveal">
-        <span class="rm-stage">ระยะ 4 · ซับซ้อน</span>
-        <h4>💧 ระบบน้ำอัตโนมัติ</h4>
-        <p>เพิ่ม relay + ปั๊มน้ำ — ปิด-เปิดตามเกณฑ์ความชื้นที่ตั้งไว้ ไม่ต้องรอคนไปรด</p>
-      </div>
-      <div class="rm reveal">
-        <span class="rm-stage">ระยะ 5 · ขยาย</span>
+        <span class="rm-stage">ระยะ 4 · ขยาย</span>
         <h4>🌾 หลายแปลง / หลาย node</h4>
         <p>เพิ่มเซ็นเซอร์หลายชุดบนสาย RS485 เดียวกัน (Modbus ID ต่างกัน) — dashboard เลือกดูแต่ละแปลงได้</p>
       </div>
       <div class="rm reveal">
-        <span class="rm-stage">ระยะ 6 · พร้อมใช้จริง</span>
+        <span class="rm-stage">ระยะ 5 · พร้อมใช้จริง</span>
         <h4>🔒 ความปลอดภัย</h4>
         <p>JWT/login สำหรับผู้ใช้, rate limiting, CORS จำกัดโดเมน, API key เปลี่ยนได้จากเว็บ</p>
       </div>
