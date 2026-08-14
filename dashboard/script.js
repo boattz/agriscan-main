@@ -7,7 +7,7 @@ const CONFIG = {
   retryDelay:   5000,
   useMockOnFail: false,   // ไม่มี mock data — แสดงข้อมูลจริงเท่านั้น
   // URL ของ backend บน Render
-  cloudApiUrl:  'https://agriscan-backend-l4vu.onrender.com'
+  cloudApiUrl:  'https://agriscan-xynf.onrender.com'
 };
 
 // ─── State ────────────────────────────────────────────────

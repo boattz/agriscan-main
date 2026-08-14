@@ -539,7 +539,7 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">โหมด Cloud (ทุกที่)</div>
         <div class="c-title">ข้อมูลจริงบนคลาวด์ — ดูจากมือถือที่ไหนก็ได้</div>
-        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 1 นาที เปิด <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
+        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 1 นาที เปิด <code class="inline">https://agriscan-xynf.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
       </div>
     </div>
   </section>
@@ -908,7 +908,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
         <div class="chain-step"><span class="no">1</span><span class="src">IP ที่ผู้ใช้ตั้งเอง (localStorage)</span><span class="why">จำจาก session ก่อนหน้า</span></div>
         <div class="chain-step"><span class="no">2</span><span class="src">URL ที่เชื่อมต่อสำเร็จล่าสุด</span><span class="why">เร็วสุดสำหรับการใช้งานซ้ำ</span></div>
         <div class="chain-step"><span class="no">3</span><span class="src">Page Origin (หน้าเว็บที่เปิดอยู่)</span><span class="why">กรณีเปิดผ่าน ESP32 หรือคลาวด์โดยตรง</span></div>
-        <div class="chain-step"><span class="no">4</span><span class="src">https://agriscan-backend-l4vu.onrender.com/data</span><span class="why">คลาวด์ Render — ค่าจริงจาก ESP32</span></div>
+        <div class="chain-step"><span class="no">4</span><span class="src">https://agriscan-xynf.onrender.com/data</span><span class="why">คลาวด์ Render — ค่าจริงจาก ESP32</span></div>
         <div class="chain-step"><span class="no">5</span><span class="src">http://agriscan.local/data</span><span class="why">mDNS ของ ESP32 (เครือข่ายท้องถิ่น)</span></div>
         <div class="chain-step"><span class="no">6</span><span class="src">http://192.168.1.1/data</span><span class="why">gateway ตอนใช้ hotspot</span></div>
         <div class="chain-step"><span class="no">7</span><span class="src">http://localhost:5000/data</span><span class="why">backend รันในเครื่อง (dev)</span></div>
@@ -969,7 +969,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
         <div class="sub-label">render.yaml — deploy อัตโนมัติ</div>
         <pre style="margin-top:0;"><span class="k">services</span>:
   - <span class="k">type</span>: web
-    <span class="k">name</span>: agriscan-backend
+    <span class="k">name</span>: agriscan
     <span class="k">rootDir</span>: backend
     <span class="k">startCommand</span>: gunicorn app:app
     <span class="k">envVars</span>:
@@ -1022,14 +1022,14 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
           <li>Push โค้ดขึ้น GitHub</li>
           <li>เข้า <b>render.com</b> → New → <b>Blueprint</b> → เลือก repo</li>
           <li>Render อ่าน <code class="inline">render.yaml</code> สร้าง <b>Web Service + PostgreSQL (free)</b> + สุ่ม <code class="inline">API_KEY</code> ให้อัตโนมัติ</li>
-          <li>เปิด URL เช่น <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> — เห็น dashboard</li>
+          <li>เปิด URL เช่น <code class="inline">https://agriscan-xynf.onrender.com</code> — เห็น dashboard</li>
           <li>คัดลอก <code class="inline">API_KEY</code> จาก Render → Environment</li>
         </ol>
 
         <div class="sub-label">D · ตั้งค่า ESP32 (agriscan.ino)</div>
 <pre><span class="k">const char</span>* WIFI_SSID = <span class="s">"YOUR_WIFI_SSID"</span>;
 <span class="k">const char</span>* WIFI_PASS = <span class="s">"YOUR_WIFI_PASSWORD"</span>;
-<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-backend-l4vu.onrender.com/api/readings"</span>;
+<span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-xynf.onrender.com/api/readings"</span>;
 <span class="k">const char</span>* API_KEY   = <span class="s">"&lt;ค่า API_KEY จาก Render&gt;"</span>;</pre>
         <p style="font-size:0.8rem; color:var(--text-secondary); font-weight:300;">
           Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 1 นาทีให้ dashboard บนคลาวด์
@@ -1098,7 +1098,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <div class="big">3</div>
         <div>
           <h4>สาธิตสด — ดูจากมือถือ</h4>
-          <p>เปิด <b>https://agriscan-backend-l4vu.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 1 นาที</p>
+          <p>เปิด <b>https://agriscan-xynf.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 1 นาที</p>
         </div>
       </div>
       <div class="pres-step">

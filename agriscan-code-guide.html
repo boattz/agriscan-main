@@ -448,7 +448,7 @@
 <pre class="reveal"><span class="k">const</span> CONFIG = {
   interval:     5000,                    <span class="c">// poll ทุก 5 วินาที</span>
   useMockOnFail: false,                  <span class="c">// ไม่มี mock data — แสดงข้อมูลจริงเท่านั้น</span>
-  cloudApiUrl:  <span class="s">'https://agriscan-backend-l4vu.onrender.com'</span>
+  cloudApiUrl:  <span class="s">'https://agriscan-xynf.onrender.com'</span>
 };
 
 <span class="k">let</span> state = { online: false, retryCount: 0, ... };  <span class="c">// ตัวแปรบอกสถานะระบบ</span></pre>
@@ -584,7 +584,7 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Push โค้ดขึ้น GitHub</li>
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render → <b>New → Blueprint</b> → เลือก repo</li>
           <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">Render สร้าง <b>Web Service + PostgreSQL</b> และสุ่ม <code class="inline">API_KEY</code> ให้</li>
-          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">ได้ URL เช่น <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> ใช้ได้ทันที</li>
+          <li style="margin-bottom:10px; font-size:0.87rem; color:var(--text-secondary);">ได้ URL เช่น <code class="inline">https://agriscan-xynf.onrender.com</code> ใช้ได้ทันที</li>
           <li style="font-size:0.87rem; color:var(--text-secondary);">เอา <code class="inline">API_KEY</code> ไปใส่ใน <code class="inline">agriscan.ino</code> → flash ESP32</li>
         </ol>
         <div class="callout info reveal" style="margin-top:14px;">
@@ -606,7 +606,7 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
     <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 1 นาที)</div>
 <pre class="reveal"><span class="c">1. ESP32 (C++)</span>
    loop() เห็นเวลาครบ 10 วินาที → uploadReading()
-   → POST https://agriscan-backend-l4vu.onrender.com/api/readings
+   → POST https://agriscan-xynf.onrender.com/api/readings
      headers: X-API-Key, Content-Type: application/json
      body: {"moisture":45.2, "temperature":28.5, ...}
 
