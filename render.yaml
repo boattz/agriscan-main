@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: agriscan-backend
+    name: agriscan
     runtime: python
     plan: free
     rootDir: backend

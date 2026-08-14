@@ -305,7 +305,7 @@
           <div class="wf-no">3</div>
           <div>
             <h4>⚙️ ESP32 ทำ 2 หน้าที่พร้อมกัน</h4>
-            <p><b>เสิร์ฟ local:</b> ตอบ <code class="inline">GET /data</code> ให้คนในบ้าน/ไร่ · <b>ส่งคลาวด์:</b> <code class="inline">POST /api/readings</code> (HTTPS) ทุก 10 วินาที</p>
+            <p><b>เสิร์ฟ local:</b> ตอบ <code class="inline">GET /data</code> ให้คนในบ้าน/ไร่ · <b>ส่งคลาวด์:</b> <code class="inline">POST /api/readings</code> (HTTPS) ทุก 1 นาที</p>
           </div>
         </div>
         <div class="wf-step">
@@ -397,7 +397,7 @@
     <span class="c">// ไม่สำเร็จ → ใช้ค่าเดิม (ระบบทนทาน)</span>
   }
 
-  <span class="c">// 4. ส่งคลาวด์ทุก 10 วินาที</span>
+  <span class="c">// 4. ส่งคลาวด์ทุก 1 นาที</span>
   <span class="k">if</span> (millis() - lastUpload &gt;= 10000) {
     uploadReading();       <span class="c">// POST ไป Render</span>
   }
@@ -603,7 +603,7 @@ DATABASE_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, <span class
       <p>จำลอง 2 สถานการณ์จริงเพื่อให้เห็นภาพว่าโค้ดแต่ละส่วนถูกเรียกเมื่อไหร่</p>
     </div>
 
-    <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 10 วินาที)</div>
+    <div class="sub-label reveal">ฉากที่ 1 — ESP32 ส่งค่าขึ้นคลาวด์ (ทุก 1 นาที)</div>
 <pre class="reveal"><span class="c">1. ESP32 (C++)</span>
    loop() เห็นเวลาครบ 10 วินาที → uploadReading()
    → POST https://agriscan-backend-l4vu.onrender.com/api/readings

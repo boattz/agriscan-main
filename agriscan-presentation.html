@@ -445,7 +445,7 @@
     <h1>Agriscan<br /><span class="grad">ระบบ IoT ตรวจวัดค่าดินแบบ Real-time</span></h1>
     <p class="lead">
       ระบบอ่านค่าคุณภาพดิน 7 อย่างจากเซ็นเซอร์ RS485 Modbus ผ่าน ESP32
-      ส่งข้อมูลจริงขึ้นคลาวด์ (Render + PostgreSQL) ทุก 10 วินาที แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที
+      ส่งข้อมูลจริงขึ้นคลาวด์ (Render + PostgreSQL) ทุก 1 นาที แสดงผลบนแดชบอร์ดเว็บที่อัปเดตทุก 5 วินาที
       พร้อมระบบแนะนำการดูแลดินอัตโนมัติอ้างอิงเกณฑ์กรมพัฒนาที่ดิน — ดูได้จากทุกที่ ไม่มีข้อมูลจำลอง
     </p>
     <div class="tags">
@@ -520,7 +520,7 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#14b8a6,#2dd4bf);">
         <div class="c-label">02 · ตัวกลาง</div>
         <div class="c-title">ESP32 ทำทุกอย่างในตัวเดียว</div>
-        <div class="c-desc">อ่านค่าเซ็นเซอร์, เสิร์ฟหน้า Dashboard ในเครือข่ายท้องถิ่น (agriscan.local) และ POST ค่าจริงขึ้นคลาวด์ทุก 10 วินาที (HTTPS + API key)</div>
+        <div class="c-desc">อ่านค่าเซ็นเซอร์, เสิร์ฟหน้า Dashboard ในเครือข่ายท้องถิ่น (agriscan.local) และ POST ค่าจริงขึ้นคลาวด์ทุก 1 นาที (HTTPS + API key)</div>
       </div>
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">03 · การแสดงผล</div>
@@ -539,7 +539,7 @@
       <div class="card reveal" style="--card-accent:linear-gradient(90deg,#3b82f6,#60a5fa);">
         <div class="c-label">โหมด Cloud (ทุกที่)</div>
         <div class="c-title">ข้อมูลจริงบนคลาวด์ — ดูจากมือถือที่ไหนก็ได้</div>
-        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 10 วินาที เปิด <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
+        <div class="c-desc">ESP32 ส่งค่าขึ้น Render (Flask + PostgreSQL) ทุก 1 นาที เปิด <code class="inline">https://agriscan-backend-l4vu.onrender.com</code> จากทุกที่เห็นค่าจริงจากไร่ ไม่มีข้อมูลจำลอง</div>
       </div>
     </div>
   </section>
@@ -696,7 +696,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
             <ul class="check" style="margin-top:10px;">
               <li><b>dashboard.h</b> ฝังหน้าเว็บทั้ง HTML/CSS/JS เป็น C++ string literal → ESP32 เสิร์ฟเองได้ ไม่ต้องพึ่งอินเทอร์เน็ต</li>
               <li><b>dashboard/</b> เป็นเวอร์ชัน standalone เดียวกัน เปิดจากเครื่องหรือ deploy กับ backend ได้</li>
-              <li><b>ESP32 → คลาวด์:</b> ส่งค่าจริงขึ้น Render ทุก 10 วินาที เก็บลง PostgreSQL — ดูข้อมูลจากที่ไหนก็ได้</li>
+              <li><b>ESP32 → คลาวด์:</b> ส่งค่าจริงขึ้น Render ทุก 1 นาที เก็บลง PostgreSQL — ดูข้อมูลจากที่ไหนก็ได้</li>
               <li>สองเวอร์ชันนี้<b>ต้องซิงค์กันด้วยมือ</b> (ไม่มี build script)</li>
             </ul>
           </div>
@@ -815,7 +815,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
             <ul class="check">
               <li><code class="inline">GET /</code> → เสิร์ฟหน้า Dashboard (จาก dashboard.h)</li>
               <li><code class="inline">GET /data</code> → ค่าเซ็นเซอร์เป็น JSON พร้อม <b>CORS เปิดทั้งหมด</b></li>
-              <li><code class="inline">POST /api/readings</code> → ส่งค่าจริงขึ้นคลาวด์ทุก 10 วินาที (<b>HTTPS + X-API-Key</b>)</li>
+              <li><code class="inline">POST /api/readings</code> → ส่งค่าจริงขึ้นคลาวด์ทุก 1 นาที (<b>HTTPS + X-API-Key</b>)</li>
               <li><code class="inline">mDNS</code> → เข้าผ่าน <code class="inline">http://agriscan.local</code> ไม่ต้องจำ IP</li>
             </ul>
           </div>
@@ -852,7 +852,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
 
     <div class="reveal">
       <div class="sub-label">ตัวอย่าง JSON ที่ ESP32 ส่งขึ้นคลาวด์ (POST /api/readings)</div>
-<pre><span class="c">// ESP32 → Render (ทุก 10 วินาที) · dashboard GET /api/latest เห็นค่านี้</span>
+<pre><span class="c">// ESP32 → Render (ทุก 1 นาที) · dashboard GET /api/latest เห็นค่านี้</span>
 { <span class="k">"moisture"</span>: <span class="n">45.2</span>, <span class="k">"temperature"</span>: <span class="n">28.5</span>, <span class="k">"ec"</span>: <span class="n">320</span>,
   <span class="k">"ph"</span>: <span class="n">6.8</span>, <span class="k">"n"</span>: <span class="n">45</span>, <span class="k">"p"</span>: <span class="n">32</span>, <span class="k">"k"</span>: <span class="n">89</span>,
   <span class="k">"valid"</span>: <span class="n">true</span> }</pre>
@@ -925,7 +925,7 @@ render.yaml      <span class="cmt">← deploy Render: Web + PostgreSQL อัต
     <div class="sec-head reveal">
       <span class="sec-num">07 — Backend & คลาวด์</span>
       <h2>Flask API + PostgreSQL — ข้อมูลจริงจาก ESP32</h2>
-      <p>ESP32 ส่งค่าจริงขึ้นคลาวด์ (Render.com) เก็บลง PostgreSQL ทุก 10 วินาที — dashboard บนเว็บดึงค่าจากฐานข้อมูล ไม่มีข้อมูลจำลอง</p>
+      <p>ESP32 ส่งค่าจริงขึ้นคลาวด์ (Render.com) เก็บลง PostgreSQL ทุก 1 นาที — dashboard บนเว็บดึงค่าจากฐานข้อมูล ไม่มีข้อมูลจำลอง</p>
     </div>
 
     <div class="grid3">
@@ -1032,7 +1032,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
 <span class="k">const char</span>* CLOUD_URL = <span class="s">"https://agriscan-backend-l4vu.onrender.com/api/readings"</span>;
 <span class="k">const char</span>* API_KEY   = <span class="s">"&lt;ค่า API_KEY จาก Render&gt;"</span>;</pre>
         <p style="font-size:0.8rem; color:var(--text-secondary); font-weight:300;">
-          Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 10 วินาทีให้ dashboard บนคลาวด์
+          Flash ผ่าน Arduino IDE (ติดตั้งไลบรารี <b>ModbusMaster</b>) — พอ ESP32 ออนไลน์ จะส่งค่าจริงทุก 1 นาทีให้ dashboard บนคลาวด์
         </p>
       </div>
     </div>
@@ -1098,7 +1098,7 @@ curl http://localhost:5000/api/latest   <span class="c"># → ค่าล่า
         <div class="big">3</div>
         <div>
           <h4>สาธิตสด — ดูจากมือถือ</h4>
-          <p>เปิด <b>https://agriscan-backend-l4vu.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 10 วินาที</p>
+          <p>เปิด <b>https://agriscan-backend-l4vu.onrender.com</b> จากมือถือ โชว์ค่าจริงที่เปลี่ยนทุก 5 วินาที + เปิด <b>Serial Monitor</b> เห็น log <code class="inline">[Cloud] POST 201</code> ทุก 1 นาที</p>
         </div>
       </div>
       <div class="pres-step">
@@ -1219,7 +1219,7 @@ function tick() {
 
   if (step === 0) lines = '🌱 [Sensor]  อ่านค่า 7 อย่างจาก Holding Registers 0x0000–0x0006\n' + lines;
   else if (step === 1) lines = '🔌 [RS485 Modbus]  ส่งข้อมูล 4800 baud ผ่านสาย 2 เส้น → ESP32 ✓';
-  else if (step === 2) lines = '⚙️ [ESP32]  POST /api/readings (HTTPS + X-API-Key) ทุก 10 วินาที:\n' + lines;
+  else if (step === 2) lines = '⚙️ [ESP32]  POST /api/readings (HTTPS + X-API-Key) ทุก 1 นาที:\n' + lines;
   else if (step === 3) lines = '☁️ [คลาวด์ Render]  บันทึกลง PostgreSQL → GET /api/latest\n' + lines;
   else lines = '🖥️ [Dashboard]  แสดงผลบนเว็บ (ดูได้จากทุกที่) + วิเคราะห์: ' + statusLine(d);
 

@@ -20,8 +20,9 @@ const char* WIFI_PASS = "05022511";
 // URL ของ backend บน Render
 const char* CLOUD_URL = "https://agriscan-backend-l4vu.onrender.com/api/readings";
 // API key อยู่ใน secrets.h (ดูจาก Render Dashboard → Environment → API_KEY)
-// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 10,000 = ทุก 10 วินาที
-#define POST_INTERVAL_MS  5000
+// ความถี่ส่งข้อมูลขึ้นคลาวด์ (มิลลิวินาที) — 60,000 = ทุก 1 นาที
+// (ค่าดินเปลี่ยนช้า ส่งถี่เกินไปจะทำให้ database เต็มเร็ว — ลดจากทุก 1 วินาที)
+#define POST_INTERVAL_MS  60000
 
 // ── RS485 ─────────────────────────────────────────────────
 #define RXD2        16
@@ -270,7 +271,7 @@ void loop() {
     Serial.println();
   }
 
-  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (10 วินาที)
+  // ส่งค่าจริงขึ้นคลาวด์ทุก POST_INTERVAL_MS (1 นาที)
   static unsigned long lastUpload = 0;
   if (millis() - lastUpload >= POST_INTERVAL_MS) {
     lastUpload = millis();

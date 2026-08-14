@@ -30,6 +30,13 @@ API_KEY = os.environ.get("API_KEY", "agriscan-dev-key")
 # ถ้าไม่ตั้ง (รันในเครื่อง) จะใช้ SQLite file อัตโนมัติ
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
+# เก็บข้อมูลกี่วันแล้วลบทิ้งอัตโนมัติ (กัน database เต็ม) — ตั้งผ่าน env RETAIN_DAYS
+RETAIN_DAYS = int(os.environ.get("RETAIN_DAYS", "7"))
+
+# ทำงาน cleanup ทุกกี่ครั้งที่รับค่า (ไม่ต้องลบทุก insert — ประหยัด resource)
+CLEANUP_EVERY = 50
+_cleanup_counter = 0
+
 app = Flask(__name__)
 CORS(app)
 
@@ -88,6 +95,26 @@ def init_db():
         print("[OK] Database พร้อมใช้งาน" + (" (PostgreSQL)" if DATABASE_URL else " (SQLite local)"))
     except Exception as e:
         print("[WARN] Database init ล้มเหลว:", e)
+
+
+def cleanup_old_readings():
+    """ลบข้อมูลที่เก่ากว่า RETAIN_DAYS วันออก — กัน database เต็ม"""
+    try:
+        with get_conn() as conn:
+            if DATABASE_URL:
+                conn.execute(
+                    "DELETE FROM readings WHERE created_at < NOW() - INTERVAL '%s days'"
+                    % RETAIN_DAYS
+                )
+            else:
+                conn.execute(
+                    "DELETE FROM readings WHERE created_at < datetime('now', '-%d days')"
+                    % RETAIN_DAYS
+                )
+            conn.commit()
+        print(f"[OK] Cleanup: ลบข้อมูลเก่ากว่า {RETAIN_DAYS} วันแล้ว")
+    except Exception as e:
+        print("[WARN] Cleanup ล้มเหลว:", e)
 
 
 def row_to_json(row):
@@ -163,6 +190,12 @@ def add_reading():
         print("⚠ Insert ล้มเหลว:", e)
         return jsonify({"error": "database error"}), 500
 
+    # ลบข้อมูลเก่าเป็นระยะ ๆ (ทุก CLEANUP_EVERY ครั้งที่รับค่า) — กัน DB เต็ม
+    global _cleanup_counter
+    _cleanup_counter += 1
+    if _cleanup_counter % CLEANUP_EVERY == 0:
+        cleanup_old_readings()
+
     return jsonify({"success": True}), 201
 
 
@@ -193,6 +226,7 @@ def data():
 
 
 init_db()
+cleanup_old_readings()  # ลบทิ้งข้อมูลเก่าครั้งแรกตอน service เริ่ม
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
